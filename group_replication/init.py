@@ -31,102 +31,158 @@ def status():
             report.append(list(row))
     return report
 
-def addInstance(connectionStr):
+def async_replication_failover(connectionStr, channelName, sourceIP, sourcePort, repl_user, repl_passwd, master_connect_retry, master_retry_count):
     import mysqlsh
-    import os
+
     shell = mysqlsh.globals.shell
-    session = shell.get_session()
+    session = shell.connect(connectionStr)
 
-    clusterAdmin = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[0]
-    clusterAdminPassword = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[1]
-    hostname = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[2]
-    port = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[3]
+    query = "change master to master_user='" + repl_user + "', master_host='" + sourceIP + "', master_port=" + sourcePort + ", master_auto_position=1, master_password='" + repl_passwd + "', source_connection_auto_failover=1, master_connect_retry=" + master_connect_retry + ", master_retry_count=" + master_retry_count + " for channel '" + channelName + "';"
+    result = session.run_sql(query)
 
-    query = "set persist group_replication_local_address='" + hostname + ":" + port + "1'"
-    result = session.run_sql(query);
+    i = 100
+   
+    session = shell.connect(repl_user + ":" + repl_passwd + "@" + sourceIP + ":" + sourcePort)
+    query = "SELECT concat(member_host,':',member_port) FROM performance_schema.replication_group_members where channel_name='group_replication_applier'"
+    result = session.run_sql(query)
+    host_list = []
+    if (result.has_data()):
+        for row in result.fetch_all():
+            host_list.append(str(list(row)).strip("[']"))
+     
+    session = shell.connect(connectionStr)
+    i = 100
+    print(len(host_list))
+    if len(host_list) != 0:
+        for item in host_list:
+            hostname = (item.replace(":"," ")).split()[0]
+            port = (item.replace(":"," ")).split()[1]
+            
+            query = "select asynchronous_connection_failover_add_source('" + channelName + "', '" + hostname + "', " + port + ", '', " + str(i) + ")"
+            result = session.run_sql(query)
+            i = i - 10
 
-    # query = "set persist group_replication_group_seeds='" + hostname + ":" + port + "1'"
-    # result = session.run_sql(query);
+    if len(host_list) != 0:    
+        query = "select * from mysql.replication_asynchronous_connection_failover"
+        result = session.run_sql(query)
+        
+        if (result.has_data()):
+            #  report = [result.get_column_names()]
+             for row in result.fetch_all():
+                 # report.append(list(row))
+                 print(list(row))
+                 # print(report)
 
-    query = "set persist group_replication_bootstrap_group=off"
-    result = session.run_sql(query);
+    query = "start replica for channel '" + channelName + "'"
+    result = session.run_sql(query)
 
-    query = "CHANGE MASTER TO MASTER_USER='" + clusterAdmin +"', MASTER_PASSWORD='" + clusterAdminPassword + "' FOR CHANNEL 'group_replication_recovery';"
-    result = session.run_sql(query);
+    query = "show replica status for channel '" + channelName + "'"
+    result = session.run_sql(query)
 
-    query = "START GROUP_REPLICATION;"
-    result = session.run_sql(query);
+    if (result.has_data()):
+        report = [result.get_column_names()]
+        for row in result.fetch_all():
+            report.append(list(row))
+    
+    return report
 
-    return status()    
-
-def convertGR(connectionStr):
+def convertToIC(connectionStr,clusterName):
     import mysqlsh
+
     shell = mysqlsh.globals.shell
-    session = shell.get_session()
-
-    clusterAdmin = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[0]
-    clusterAdminPassword = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[1]
-    hostname = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[2]
-    port = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[3]
-
-    query = "set persist group_replication_local_address='" + hostname + ":" + port + "1'"
-    result = session.run_sql(query);
-
-    # query = "set persist group_replication_group_seeds='" + hostname + ":" + port + "1'"
-    # result = session.run_sql(query);
-
-    query = "set persist group_replication_bootstrap_group=off"
-    result = session.run_sql(query);
-
-    query = "CHANGE MASTER TO MASTER_USER='" + clusterAdmin +"', MASTER_PASSWORD='" + clusterAdminPassword + "' FOR CHANNEL 'group_replication_recovery';"
-    result = session.run_sql(query);
-
-    query = "SET GLOBAL group_replication_bootstrap_group=ON;"
-    result = session.run_sql(query);
-
-    query = "START GROUP_REPLICATION;"
-    result = session.run_sql(query);
-
-    query = "SET GLOBAL group_replication_bootstrap_group=OFF;"
-    result = session.run_sql(query);
-
-    return status()
-
-def dissolve():
-    import mysqlsh
-    shell = mysqlsh.globals.shell
-    session = shell.get_session()
-
-    query = "stop group_replication;"
-    result = session.run_sql(query);
-
-    query = "set sql_log_bin=0; "
-    result = session.run_sql(query);
-
-    query = "set global super_read_only=off;"
-    result = session.run_sql(query);
-
-    query = "set global read_only=off; "
-    result = session.run_sql(query);
+    session = shell.connect(connectionStr)
 
     query = "drop database if exists mysql_innodb_cluster_metadata;"
-    result = session.run_sql(query);
+    result = session.run_sql(query)
 
-    query = "set sql_log_bin=1"
-    result = session.run_sql(query);
+    query = "select channel_name from performance_schema.replication_connection_configuration where CHANNEL_NAME<>'group_replication_applier'"
+    result = session.run_sql(query)
+    if (result.has_data()):
+        for row in result.fetch_all():
+             channelName = str(list(row)).strip("[']")
+             
+             query = "stop replica for channel '" + channelName + "'"
+             result = session.run_sql(query)
 
-    return status()
+    dba.create_cluster(clusterName, {"adoptFromGR":"true"})
 
-def setGroupReplicationGroupSeed(seedStr):
+    return dba.get_cluster().status()
+
+
+def adoptFromIC(connectionStr):
     import mysqlsh
-    import os
+    import time
+    
     shell = mysqlsh.globals.shell
-    session = shell.get_session()
+    session = shell.connect(connectionStr)
 
-    query = "set persist group_replication_group_seeds='" + seedStr + "'"
-    result = session.run_sql(query);
+    clusterAdmin = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[0]
+    clusterAdminPassword = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[1]
+    hostname = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[2]
+    port = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[3]
+    local_address = hostname + ":" + port
 
-    return print("Group Replication Group Seed is set to " + seedStr)
+    query = "SELECT concat(member_host,':',member_port) FROM performance_schema.replication_group_members where channel_name='group_replication_applier'"
+    result = session.run_sql(query)
+    gr_group_seed = ""
+    host_list = []
+    if (result.has_data()):
+        for row in result.fetch_all():
+            if gr_group_seed != "":
+                gr_group_seed = gr_group_seed + ","
+            grmember = str(list(row)).strip("[']")
+            gr_group_seed = gr_group_seed + grmember + "1"
+            host_list.append(grmember)
+    user_credential = connectionStr.replace("@", " ").split()[0]
+    dba.get_cluster().dissolve({"interactive":"false"})  
+
+    query = "set persist group_replication_local_address='" + local_address + "1'"
+    result = session.run_sql(query)
+
+    query = "set persist group_replication_group_seeds='" + gr_group_seed + "'"
+    result = session.run_sql(query)
+
+    query = "set persist group_replication_bootstrap_group=off"
+    result = session.run_sql(query)
+
+    query = "CHANGE MASTER TO MASTER_USER='" + clusterAdmin + "', MASTER_PASSWORD='" + clusterAdminPassword + "' FOR CHANNEL 'group_replication_recovery';"
+    result = session.run_sql(query)
+
+    query = "SET GLOBAL group_replication_bootstrap_group=ON;"
+    result = session.run_sql(query)
+
+    query = "START GROUP_REPLICATION;"
+    result = session.run_sql(query)
+
+    query = "SET GLOBAL group_replication_bootstrap_group=OFF;"
+    result = session.run_sql(query)
+
+    time.sleep(10); 
+
+    for item in host_list:
+        if item != local_address:
+             session = shell.connect(user_credential + "@" + item)
+
+             query = "set persist group_replication_local_address='" + item + "1'"
+             result = session.run_sql(query)
+
+             query = "set persist group_replication_group_seeds='" + gr_group_seed + "'"
+             result = session.run_sql(query)
+
+             query = "set persist group_replication_bootstrap_group=off"
+             result = session.run_sql(query)
+
+             query = "CHANGE MASTER TO MASTER_USER='" + clusterAdmin + "', MASTER_PASSWORD='" + clusterAdminPassword + "' FOR CHANNEL 'group_replication_recovery';"
+             result = session.run_sql(query)
+
+             query = "START GROUP_REPLICATION;"
+             result = session.run_sql(query)
+
+             time.sleep(10)
+
+    session = shell.connect(connectionStr)
+       
+    return status() 
 
 
 if 'group_replication' in globals():
@@ -138,15 +194,34 @@ else:
                           {"brief": "MySQL Shell extension plugins."})
 
 #You can add sub objects to global objects by category
+
     shell.add_extension_object_member(global_obj,
-                                      "convertGR",
-                                      convertGR, {
-                                       "brief":"Convert into Group Replication",
+                                      "adoptFromIC",
+                                      adoptFromIC, {
+                                       "brief":"Convert from InnoDB Cluster into Group Replication",
                                        "parameters": [
                                        {
                                             "name":"connectionStr",
                                             "type":"string",
                                             "brief":"clusterAdmin:clusterAdminPassword@hostname:port"
+                                        }
+                                        ] }
+                                      );
+
+    shell.add_extension_object_member(global_obj,
+                                      "convertToIC",
+                                      convertToIC, {
+                                       "brief":"Convert From Group Replication to InnoDB Cluster",
+                                       "parameters": [
+                                       {
+                                            "name":"connectionStr",
+                                            "type":"string",
+                                            "brief":"clusterAdmin:clusterAdminPassword@hostname:port"
+                                        },
+                                        {
+                                            "name":"clusterName",
+                                            "type":"string",
+                                            "brief":"Any name for your InnoDB Cluster"
                                         }
                                         ] }
                                       );
@@ -159,34 +234,49 @@ else:
                                       );
 
     shell.add_extension_object_member(global_obj,
-                                      "addInstance",
-                                      addInstance, {
-                                       "brief":"Add instance into Group Replication",
+                                      "async_replication_failover",
+                                      async_replication_failover, {
+                                       "brief":"Establish asynchronous with HA",
                                        "parameters": [
                                        {
                                             "name":"connectionStr",
                                             "type":"string",
                                             "brief":"clusterAdmin:clusterAdminPassword@hostname:port"
-                                        }
-                                        ] }
-                                      );
-
-    shell.add_extension_object_member(global_obj,
-                                      "setGroupReplicationGroupSeed",
-                                      setGroupReplicationGroupSeed, {
-                                       "brief":"Set Group Replication group seed",
-                                       "parameters": [
-                                       {
-                                            "name":"seedStr",
+                                        },
+                                        {
+                                            "name":"channelName",
                                             "type":"string",
-                                            "brief":"group replication group seed"
+                                            "brief":"Any name for your replication channel"
+                                        },
+                                        {
+                                            "name":"sourceIP",
+                                            "type":"string",
+                                            "brief":"Source hostname / IP"
+                                        },
+                                        {
+                                            "name":"sourcePort",
+                                            "type":"string",
+                                            "brief":"Source port number"
+                                        },
+                                        {
+                                            "name":"repl_user",
+                                            "type":"string",
+                                            "brief":"Replication user name"
+                                        },
+                                        {
+                                            "name":"repl_passwd",
+                                            "type":"string",
+                                            "brief":"Replication user password"
+                                        },
+                                        {
+                                            "name":"master_connect_retry",
+                                            "type":"string",
+                                            "brief":"master_connect_retry parameter"
+                                        },
+                                        {
+                                            "name":"master_retry_count",
+                                            "type":"string",
+                                            "brief":"master_retry_count parameter"
                                         }
                                         ] }
-                                      );
-
-    shell.add_extension_object_member(global_obj,
-                                      "dissolve",
-                                      dissolve, {
-                                       "brief":"Exit from the group"
-                                        }
                                       );
