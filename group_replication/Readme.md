@@ -1,6 +1,6 @@
 # MySQL Shell's Extension Objects for Group Replication management
 </br>
-This is custom MySQL Shell Plugin for Group Replication's replication to InnoDB Cluster. </br>
+This is a community-based custom MySQL Shell Plugin for Group Replication's replication to InnoDB Cluster. </br>
 </br>
 The following functions are added into MySQL Shell's standard adminAPI: </br>
 </br>
