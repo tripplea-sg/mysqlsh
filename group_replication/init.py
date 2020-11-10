@@ -95,7 +95,7 @@ def convertToIC(connectionStr,clusterName):
     query = "drop database if exists mysql_innodb_cluster_metadata;"
     result = session.run_sql(query)
 
-    query = "select channel_name from performance_schema.replication_connection_configuration where CHANNEL_NAME<>'group_replication_applier'"
+    query = "select channel_name from performance_schema.replication_connection_configuration where CHANNEL_NAME not like 'group_replication_%'"
     result = session.run_sql(query)
     if (result.has_data()):
         for row in result.fetch_all():
@@ -184,6 +184,47 @@ def adoptFromIC(connectionStr):
        
     return status() 
 
+def registerNode(connectionStr,grSeed,isPrimary):
+    import mysqlsh
+
+    shell = mysqlsh.globals.shell
+    session = shell.get_session()
+
+    clusterAdmin = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[0]
+    clusterAdminPassword = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[1]
+    hostname = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[2]
+    port = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[3]
+
+    result = session.run_sql("select count(1) from information_schema.plugins where plugin_name='group_replication'")
+    if (result.has_data()):
+        for row in result.fetch_all():
+             i = str(list(row)).strip("[']")
+
+    if i == "0":
+       result = session.run_sql("INSTALL PLUGIN group_replication SONAME 'group_replication.so';")
+    
+    result = session.run_sql("set persist group_replication_group_name='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'")
+    result = session.run_sql("set persist group_replication_start_on_boot='OFF'")
+    result = session.run_sql("set persist group_replication_bootstrap_group=off")
+    result = session.run_sql("CHANGE MASTER TO MASTER_USER='" + clusterAdmin + "', MASTER_PASSWORD='" + clusterAdminPassword + "' FOR CHANNEL 'group_replication_recovery';")
+    result = session.run_sql("set persist group_replication_local_address='" + hostname + ":" + port + "1'")
+    
+    result = session.run_sql("set sql_log_bin=0;")
+    result = session.run_sql("alter user gradmin@'%' identified with mysql_native_password by 'grpass';")
+    result = session.run_sql("FLUSH PRIVILEGES;")
+    result = session.run_sql("set sql_log_bin=1;")
+
+    result = session.run_sql("set persist group_replication_group_seeds='" + grSeed + "'")
+
+    if isPrimary:
+        result = session.run_sql("SET GLOBAL group_replication_bootstrap_group=ON")
+    
+    result = session.run_sql("START GROUP_REPLICATION;")
+    
+    if isPrimary:
+        result = session.run_sql("SET GLOBAL group_replication_bootstrap_group=OFF")
+
+    return status()
 
 if 'group_replication' in globals():
     global_obj = group_replication
@@ -279,4 +320,28 @@ else:
                                             "brief":"master_retry_count parameter"
                                         }
                                         ] }
+                                      );
+
+    shell.add_extension_object_member(global_obj,
+                                      "registerNode",
+                                      registerNode, {
+                                       "brief":"Deploy primary node ef the group",
+                                       "parameters": [
+                                       {
+                                            "name":"connectionStr",
+                                            "type":"string",
+                                            "brief":"clusterAdmin:clusterAdminPassword@hostname:port"
+                                        },
+                                        {
+                                            "name":"grSeed",
+                                            "type":"string",
+                                            "brief":"Group replication group seed"
+                                        },
+                                        {
+                                            "name":"isPrimary",
+                                            "type":"bool",
+                                            "brief":"declare primary node or not"
+                                        }
+                                       ]
+                                        }
                                       );
