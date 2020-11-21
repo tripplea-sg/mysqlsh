@@ -63,10 +63,19 @@ mysqlsh > group_replication.status()
 ```
 When any nodes is restarted, it will autojoin to Group Replication without manual intervention </br>
 This is because system variable group_replication_start_on_boot is set to ON.
-
-
-
-* group_replication.convertToIC(connectionStr,clusterName): This is the function to convert group replication to InnoDB Cluster </br>
-</br>
-* group_replication.adoptFromIC(connectionStr): This is the function to convert InnoDB Cluster to group replication </br>
-
+## How to convert Group Replication to InnoDB Cluster
+Let say we want to run as InnoDB Cluster instead of Group Replication, then login to PRIMARY node and run below:
+```
+mysqlsh > group_replication.convertToIC('<any_cluster_name>')
+```
+Check InnoDB Cluster status as follow:
+```
+mysqlsh > var cluster = dba.getCluster()
+mysqlsh > cluster.status()
+```
+## How to convert InnoDB Cluster to Group Replication
+Let say for some reasons we want to convert InnoDB Cluster to Group Replication (i.e. for DR purposes). </br>
+Login to PRIMARY node and run below:
+```
+mysqlsh > group_replication.adoptFromIC()
+```
