@@ -4,7 +4,7 @@ The codes and methods here are beta version, and we have not tested against prod
 Appreciate your feedback.
 ## Plugin Installation
 1. Copy init.py
-2. Paste into $HOME/.mysqlsh/group_replication/init.py
+2. Paste into $HOME/.mysqlsh/plugins/group_replication/init.py
 ## Steps to create Group Replication using Shell
 ### A. Environment
 Let say we have 3 instances: 
