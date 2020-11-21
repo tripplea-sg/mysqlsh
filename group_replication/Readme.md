@@ -1,6 +1,7 @@
 # MySQL Shell's Extension Objects for Group Replication management
 This is a community-based custom MySQL Shell Plugin for Group Replication's replication to InnoDB Cluster. </br>
-The codes and methods here are beta version, and we have not tested against production environment.
+The codes and methods here are beta version, and we have not tested against production environment. </br>
+Appreciate your feedback.
 ## Plugin Installation
 1. Copy init.py
 2. Paste into $HOME/.mysqlsh/group_replication/init.py
@@ -40,6 +41,39 @@ mysqlsh > group_replication.addInstance("gradmin:grpass@node3:3306")
 View group replication status to ensure all nodes are ONLINE
 ```
 mysqlsh > group_replication.status()
+```
+## How to add additional node to existing Group Replication
+If we have a new database, let say node4:3306, and we want to add this database to the group. </br>
+### A. Configure Instance Node4
+Connect to Node4 using mysqlsh and run configure-instance
+```
+mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3306 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
+```
+### B. Clone from PRIMARY node
+On PRIMARY node:
+```
+mysql > install plugin clone soname 'mysql_clone.so';
+mysql > create user clone@'%' identified by 'clone';
+mysql > grant backup_admin on *.* to clone@'%';
+```
+On Node4:
+```
+mysql > install plugin clone soname 'mysql_clone.so';
+mysql > set global clone_valid_donor_list='node2:3306';
+mysql > clone instance from clone@node2:3306 identified by 'clone';
+```
+Reconnect to Node4, and uninstall clone plugin
+```
+mysql > uninstall plugin clone;
+```
+Reconnect to PRIMARY, and uninstall clone plugin
+```
+mysql > uninstall plugin clone;
+```
+### C. Add Instance Node4
+Using MySQL Shell, connect to PRIMARY node and run group_replication.addInstance()
+```
+mysqlsh > group_replication.addInstance("gradmin:grpass@node4:3306")
 ```
 ## How to Switch Primary Instance to Another node
 Let say we want to switch PRIMARY node to Node2
