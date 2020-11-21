@@ -41,13 +41,32 @@ View group replication status to ensure all nodes are ONLINE
 ```
 mysqlsh > group_replication.status()
 ```
-
-
+## How to Switch Primary Instance to Another node
+Let say we want to switch PRIMARY node to Node2
+```
+mysqlsh > group_replication.setPrimaryInstance("gradmin:grpass@node2:3306")
+```
+Check the group replication status to ensure the result:
+```
+mysqlsh > group_replication.status()
+```
+## How to reboot Group Replication From Complete Outage
+Let say all nodes are down. Start all nodes, and run rebootGRFromCompleteOutage below from one of the nodes:
+```
+mysqlsh gradmin:grpass@node2:3306
+mysqlsh > group_replication.rebootGRFromCompleteOutage("node1:3306,node2:3306,node3:3306")
+```
+Key-in the cluster Admin Password. </br>
+Check group replication status
+```
+mysqlsh > group_replication.status()
+```
+When any nodes is restarted, it will autojoin to Group Replication without manual intervention </br>
+This is because system variable group_replication_start_on_boot is set to ON.
 
 
 
 * group_replication.convertToIC(connectionStr,clusterName): This is the function to convert group replication to InnoDB Cluster </br>
 </br>
 * group_replication.adoptFromIC(connectionStr): This is the function to convert InnoDB Cluster to group replication </br>
-</br>
-* group_replication.registerNode(connectionStr,grSeed,isPrimary): This is the function to deploy Group replication </br>
+
