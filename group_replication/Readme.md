@@ -12,6 +12,7 @@ Let say we have 3 instances:
 2. Node2, port 3306
 3. Node3, port 3306
 ### B. Configure Instance
+Assume clusterAdmin = gradmin, clusterAdminPassword = grpass </br>
 Login to Node1:
 ```
 mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3306 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
