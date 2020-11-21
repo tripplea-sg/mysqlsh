@@ -44,6 +44,7 @@ mysqlsh > group_replication.status()
 ```
 ## How to add additional node to existing Group Replication
 If we have a new database, let say node4:3306, and we want to add this database to the group. </br>
+In future, I might work on how to automate the following processes. It's possible to build function on this.
 ### A. Configure Instance Node4
 Connect to Node4 using mysqlsh and run configure-instance
 ```
