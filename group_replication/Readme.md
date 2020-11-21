@@ -1,6 +1,13 @@
 # MySQL Shell's Extension Objects for Group Replication management
 This is a community-based custom MySQL Shell Plugin for Group Replication's replication to InnoDB Cluster. 
-## Steps to create Group Replication
+## Plugin Installation
+1. Copy init.py
+2. Paste into $HOME/.mysqlsh/group_replication/init.py
+## Steps to create Group Replication using Shell
+Let say we have 3 instances: 
+1. Node1, port 3306
+2. Node2, port 3306
+3. Node3, port 3306
 ### Configure Instance
 
 
