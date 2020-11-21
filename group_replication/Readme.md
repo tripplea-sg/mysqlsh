@@ -1,7 +1,7 @@
 # Integrating MySQL Shell with Group Replication
 This is a community-based custom MySQL Shell Plugin for Group Replication. </br>
 The codes and methods here are beta version, and we have not tested against production environment. </br>
-Appreciate your feedback.
+Appreciate your kind feedback.
 ## Plugin Installation
 1. Copy init.py
 2. Paste into $HOME/.mysqlsh/plugins/group_replication/init.py
