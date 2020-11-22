@@ -1,4 +1,5 @@
 # Disaster Recovery Handling
+Disaster Recovery handling is unique and specific. Many organizations have DR runbook as a guide to perform Disaster Recovery activation, where its validity and workability shall be tested during DR exercise. This note does not guarrantee it would be successful on all environments, therefore it needs to be tested and modify to meet the specific needs. </br>
 We simulate situation whereby primary site (InnoDB Cluster) is completely down and data is coming to secondary site when primary site is unavailable.
 ## Making Primary Site (InnoDB Cluster) unavaibale
 On node-1, shutdown all databases
