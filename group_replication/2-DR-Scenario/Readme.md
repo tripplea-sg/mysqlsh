@@ -129,7 +129,7 @@ mysql -uroot -h127.0.0.1 -P3306
 mysql > change master to master_user='repl', master_password='repl', master_host='test-929103', master_port=6446, master_auto_position=1, master_ssl=1, get_master_public_key=1 for channel 'channel1';
 mysql > start replica for channel 'channel1';
 mysql > show replica status for channel 'channel1' \G
+mysql > stop replica for channel 'channel1';
 ```
-Under certain circumtances, we got error "Last_SQL_Error: Could not execute Update_rows event on table mysql_innodb_cluster_metadata.instances; Can't find record in 'instances', Error_code: 1032; handler error HA_ERR_KEY_NOT_FOUND; the event's master log bin.000004, end_log_pos 395817"
-</br>
-If this error is occured, then we need to rebuild Disaster Recovery.
+We encounter the following error: Last_SQL_Error: Error executing row event: 'Unknown database 'mysql_innodb_cluster_metadata'' </br>
+
