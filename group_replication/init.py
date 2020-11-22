@@ -154,6 +154,7 @@ def addInstance(connectionStr):
     result = remote_session.run_sql("set sql_log_bin=off")
     result = remote_session.run_sql("set global super_read_only=off")
     result = remote_session.run_sql("drop database if exists mysql_innodb_cluster_metadata;")
+    result = remote_session.run_sql("set global super_read_only=on")
     result = remote_session.run_sql("set sql_log_bin=on")
     
     result = remote_session.run_sql("set persist group_replication_group_name='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'")
@@ -186,7 +187,9 @@ def create():
        result = session.run_sql("INSTALL PLUGIN group_replication SONAME 'group_replication.so';")
 
     result = session.run_sql("set sql_log_bin=off")
+    result = session.run_sql("set global super_read_only=off")
     result = session.run_sql("drop database if exists mysql_innodb_cluster_metadata;")
+    result = session.run_sql("set global super_read_only=on")
     result = session.run_sql("set sql_log_bin=on")
     
     result = session.run_sql("set persist group_replication_group_name='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'")
