@@ -131,5 +131,37 @@ mysql > change replication filter replicate_ignore_db=(mysql_innodb_cluster_meta
 mysql > start replica for channel 'channel1';
 mysql > show replica status for channel 'channel1' \G
 ```
-
-
+#### E. Let's test create transaction on Node1 (3306)
+```
+Connect to 3306 on Node1 (PRIMARY), and create transaction
+```
+mysql -uroot -h127.0.0.1 -P3306 -e "insert into test.test value (20)"
+```
+On node2, check the records on all nodes:
+```
+mysql -uroot -h127.0.0.1 -P3306 -e "select * from test.test"
+mysql -uroot -h127.0.0.1 -P3307 -e "select * from test.test"
+mysql -uroot -h127.0.0.1 -P3308 -e "select * from test.test"
+```
+Record is successfully replicated from Node2 to Node1.
+#### F. Migrate mysql_innodb_cluster_metadata
+Backup schema mysql_innodb_cluster_metadata on Node 1 (3306)
+```
+mysqlsh root@localhost:3306 -e "util.dumpSchemas(['mysql_innodb_cluster_metadata'], '/home/opc/config/backup/')"
+```
+Stop replication on Node 2  and remove replication filter (3306)
+```
+mysql> stop replica for channel 'channel1';
+mysql> change replication filter replicate_ignore_db=() for channel 'channel1';
+```
+Restore mysql_innodb_cluster_metadata to node 2
+```
+mysqlsh gradmin:grpass@test-drive-preparation:3306 --interactive -e "util.loadDump('/home/opc/config/backup')"
+```
+On Node 2 (3306), start replication channel
+```
+start replica for channel 'channel1';
+show replica status for channel 'channel1' \G
+```
+```
+```
