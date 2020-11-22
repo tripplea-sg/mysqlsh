@@ -161,3 +161,4 @@ mysql -uroot -h127.0.0.1 -P3307 -e "select * from test.test"
 mysql -uroot -h127.0.0.1 -P3308 -e "select * from test.test"
 ```
 Record is successfully replicated from Node1 to Node2.
+## Conclusion
