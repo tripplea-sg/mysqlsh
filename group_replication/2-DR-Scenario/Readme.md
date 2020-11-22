@@ -162,3 +162,10 @@ mysql -uroot -h127.0.0.1 -P3308 -e "select * from test.test"
 ```
 Record is successfully replicated from Node1 to Node2.
 ## Conclusion
+How to perform site role switchover:
+1. Stop router used by replication between InnoDB Cluster and Group Replication
+2. Change replication on Group Replication PRIMARY node pointing to PRIMARY node of InnoDB Cluster directly
+3. Convert InnoDB Cluster to Group Replication using MySQL Shell
+4. Stop replica and convert Group Replication to InnoDB Cluster using MySQL Shell
+5. Configure replication from InnoDB Cluster to Group Replication
+Remember that site role switchover is planned activity, thus all applications are expected to be inactive and no new records are coming.
