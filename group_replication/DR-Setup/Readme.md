@@ -17,9 +17,10 @@ node2
 IP Address  : 10.0.0.88
 Hostname    : test-drive-preparation
 ```
+Requirement: </br>
+All nodes have to be restarted with skip-slave-start. The best way is to put skip-slave-start on Option files.
 3. All MySQL instances are on MySQL 8.0.22
 ## C. Create InnoDB Cluster on Node1
-Note: All nodes have to be restarted with skip-slave-start. The best way is to put skip-slave-start on Option files.
 ### C.1. Create Databases (3306, 3307, 3308)
 ```
 mysqld --defaults-file=3306.cnf --initialize-insecure
