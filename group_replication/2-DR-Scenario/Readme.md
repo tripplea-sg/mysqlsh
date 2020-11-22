@@ -75,7 +75,7 @@ Change Primary Node of Group Replication on Node 1 from 3307 to 3306
 ```
 mysql -uroot -h127.0.0.1 -P3307 -e "restart"
 ```
-Still on Node2, connect to instance 3306 and activate replication:
+Still on Node1, connect to instance 3306 and activate replication:
 ```
 mysql -uroot -h127.0.0.1 -P3306
 mysql > change master to master_user='repl', master_password='repl', master_host='test-drive-preparation', master_port=6446, master_auto_position=1, master_ssl=1, get_master_public_key=1 for channel 'channel1';
