@@ -41,3 +41,16 @@ mysql > change master to master_user='repl', master_password='repl', master_host
 start replica for channel 'channel1';
 show replica status for channel 'channel1' \G
 ```
+#### E. Let's Test
+Connect to 3307 on Node2 (PRIMARY) and create transaction:
+```
+mysql -uroot -h127.0.0.1 -P3307
+mysql > insert into test.test values (8);
+```
+On Node1, check the records on all nodes:
+```
+mysql -uroot -h127.0.0.1 -P3306 -e "select * from test.test"
+mysql -uroot -h127.0.0.1 -P3307 -e "select * from test.test"
+mysql -uroot -h127.0.0.1 -P3308 -e "select * from test.test"
+```
+Record is successfully replicated from Node2 to Node1.
