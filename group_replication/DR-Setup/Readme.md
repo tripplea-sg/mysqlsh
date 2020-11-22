@@ -107,6 +107,7 @@ Connect to 3306 instance on Node 2
 mysql -uroot -h127.0.0.1 -P3306
 mysql> change master to master_user='repl', master_password='repl', master_host='test-929103', master_port=6446, master_auto_position=1, master_ssl=1, get_master_public_key=1 for channel 'channel1';
 mysql > start replica for channel 'channel1';
+mysql> grant all privileges on *.* to repl@'%';
 ```
 ### E.3. Show Replication Channel Status
 ```
