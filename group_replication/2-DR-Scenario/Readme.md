@@ -33,4 +33,11 @@ Deploy Router connecting to InnoDB Cluster on Node2
 mysqlrouter --bootstrap gradmin:grpass@localhost:3307 --directory router
 router/start.sh
 ```
-### D. Create Replication Channel on PRIMARY Node of InnoDB Cluster
+### D. Create Replication Channel on PRIMARY Node of Group Replication (Node1)
+Connect to 3307 on Node1 (PRIMARY), and create replication to MySQL Router
+```
+mysql -uroot -h127.0.0.1 -P3307
+mysql > change master to master_user='repl', master_password='repl', master_host='test-drive-preparation', master_port=6446, master_auto_position=1, master_ssl=1, get_master_public_key=1 for channel 'channel1';
+start replica for channel 'channel1';
+show replica status for channel 'channel1' \G
+```
