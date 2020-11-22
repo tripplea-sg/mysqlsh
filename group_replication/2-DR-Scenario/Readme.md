@@ -130,3 +130,6 @@ mysql > change master to master_user='repl', master_password='repl', master_host
 mysql > start replica for channel 'channel1';
 mysql > show replica status for channel 'channel1' \G
 ```
+Under certain circumtances, we got error "Last_SQL_Error: Could not execute Update_rows event on table mysql_innodb_cluster_metadata.instances; Can't find record in 'instances', Error_code: 1032; handler error HA_ERR_KEY_NOT_FOUND; the event's master log bin.000004, end_log_pos 395817"
+</br>
+If this error is occured, then we need to rebuild Disaster Recovery.
