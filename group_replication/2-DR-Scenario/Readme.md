@@ -132,7 +132,6 @@ mysql > start replica for channel 'channel1';
 mysql > show replica status for channel 'channel1' \G
 ```
 #### E. Let's test create transaction on Node1 (3306)
-```
 Connect to 3306 on Node1 (PRIMARY), and create transaction
 ```
 mysql -uroot -h127.0.0.1 -P3306 -e "insert into test.test value (20)"
