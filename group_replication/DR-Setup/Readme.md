@@ -17,7 +17,9 @@ node2
 IP Address  : 10.0.0.88
 Hostname    : test-drive-preparation
 ```
+3. All MySQL instances are on MySQL 8.0.22
 ## C. Create InnoDB Cluster on Node1
+Note: All nodes have to be restarted with skip-slave-start. The best way is to put skip-slave-start on Option files.
 ### C.1. Create Databases (3306, 3307, 3308)
 ```
 mysqld --defaults-file=3306.cnf --initialize-insecure
@@ -53,7 +55,60 @@ mysqlsh gradmin:grpass@localhost:3306 -- cluster status
 ```
 mysql -uroot -h127.0.0.1 -P3306 -e "create user repl@'%' identified by 'repl'; grant replication slave on *.* to repl@'%'"
 ```
-
-
+## D. Create Group Replication on Node2
+### D.1. Create Databases (3306, 3307, 3308)
+```
+mysqld --defaults-file=3306.cnf --initialize-insecure
+mysqld --defaults-file=3307.cnf --initialize-insecure
+mysqld --defaults-file=3308.cnf --initialize-insecure
+```
+Note: in real life schenario, it can be more complex, involving backup one of the node on Node1 and restore on 3306, 3307, 3308.
+### D.2. Start Instances 
+```
+mysqld_safe --defaults-file=3306.cnf &
+mysqld_safe --defaults-file=3307.cnf &
+mysqld_safe --defaults-file=3308.cnf &
+```
+### D.3. Configure Instances
+```
+mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3306 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
+mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3307 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
+mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3308 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
+```
+### D.4. Create Group Replication on 3306
+Login to 3306 using mysqlsh
+```
+mysqlsh gradmin:grpass@localhost:3306 
+```
+Create Group Replication
+```
+mysqlsh > group_replication.create()
+```
+### D.5. Add Instance 3307, 3308 into cluster
+```
+mysqlsh > group_replication.addInstance("gradmin:grpass@localhost:3307")
+mysqlsh > group_replication.addInstance("gradmin:grpass@localhost:3308")
+```
+### D.6. Check Cluster Status
+```
+mysqlsh > group_replication.status()
+```
+## E. Setup Replication between InnoDB Cluster to Group Replication
+### E.1. Setup Router on Node1 Pointing to InnoDB Cluster
+```
+mysqlrouter --bootstrap gradmin:grpass@test-929103:3306 --directory router
+router/start.sh
+```
+### E.2. Setup Replication on Node2 Pointing to Router
+Connect to 3306 instance on Node 2
+```
+mysql -uroot -h127.0.0.1 -P3306
+mysql> change master to master_user='repl', master_password='repl', master_host='test-929103', master_port=6446, master_auto_position=1, master_ssl=1, get_master_public_key=1 for channel 'channel1';
+mysql > start replica for channel 'channel1';
+```
+### E.3. Show Replication Channel Status
+```
+mysql> show replica status for channel 'channel1' \G
+```
 
 
