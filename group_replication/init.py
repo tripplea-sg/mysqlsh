@@ -71,7 +71,8 @@ def adoptFromIC():
     session = shell.get_session()
     
     clusterAdmin = session.get_uri().replace("mysql://","").replace("@"," ").replace(":"," ").split()[0]
-
+    
+    msg_output = "Test"
     result = session.run_sql("select member_role from performance_schema.replication_group_members where channel_name='group_replication_applier' and concat(member_host,':',member_port)='" + session.get_uri().replace('@',' ').split()[1].replace('localhost','127.0.0.1') + "'")
     if (result.has_data()):
         for row in result.fetch_all():
@@ -150,6 +151,10 @@ def addInstance(connectionStr):
     if i == "0":
        result = remote_session.run_sql("INSTALL PLUGIN group_replication SONAME 'group_replication.so';")
 
+    result = remote_session.run_sql("set sql_log_bin=off")
+    result = remote_session.run_sql("drop database if exists mysql_innodb_cluster_metadata;")
+    result = remote_session.run_sql("set sql_log_bin=on")
+    
     result = remote_session.run_sql("set persist group_replication_group_name='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'")
     result = remote_session.run_sql("set persist group_replication_start_on_boot='ON'")
     result = remote_session.run_sql("set persist group_replication_bootstrap_group=off")
@@ -179,6 +184,10 @@ def create():
     if i == "0":
        result = session.run_sql("INSTALL PLUGIN group_replication SONAME 'group_replication.so';")
 
+    result = session.run_sql("set sql_log_bin=off")
+    result = session.run_sql("drop database if exists mysql_innodb_cluster_metadata;")
+    result = session.run_sql("set sql_log_bin=on")
+    
     result = session.run_sql("set persist group_replication_group_name='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'")
     result = session.run_sql("set persist group_replication_start_on_boot='ON'")
     result = session.run_sql("set persist group_replication_bootstrap_group=off")
