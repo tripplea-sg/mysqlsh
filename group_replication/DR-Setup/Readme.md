@@ -6,6 +6,7 @@
 4. Asynchronous Replication from InnoDB Cluster to Group Replication
 5. Router on DC2 for Group Replication to connect to InnoDB Cluster
 ## B. Environment to simulate
+![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/DR-Setup/Screenshot%202020-11-22%20at%209.15.08%20AM.png)
 1. Two Compute Node in OCI
 2. One Compute Node for InnoDB Cluster, and the other one for Group Replication
 ```
