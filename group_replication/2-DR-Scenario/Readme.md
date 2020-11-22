@@ -4,7 +4,7 @@ We tested this design with the following scenarios:
 2. Perform PRIMARY node failover on both node-1 and node-2
 3. Switch back node-1 to InnoDB Cluster, switch back node-2 to Group Replication and reverse back replication from node1 to node-2
 Caveat: Site Role Switch-over is mostly manual process and hardly automated, because moving operation to DR site is also a business decision and require DR declaration. </br>
-Assumption: Site role switch over requires application shutdown and no transaction to come. Or else, it's considered unsafe.
+Assumption: Site role switch over requires application shutdown and no transaction. Or else, it's considered unsafe.
 ## Role Switch (Node1 = Group Replication, Node2 = InnoDB Cluster)
 #### A. Stop MySQL Router on Node1
 ```
