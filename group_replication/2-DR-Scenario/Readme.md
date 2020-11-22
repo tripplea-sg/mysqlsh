@@ -127,9 +127,9 @@ Connect to 3306 on Node2 (PRIMARY), and create replication to MySQL Router
 ```
 mysql -uroot -h127.0.0.1 -P3306
 mysql > change master to master_user='repl', master_password='repl', master_host='test-929103', master_port=6446, master_auto_position=1, master_ssl=1, get_master_public_key=1 for channel 'channel1';
+mysql > change replication filter replicate_ignore_db=(mysql_innodb_cluster_metadata) for channel 'channel1';
 mysql > start replica for channel 'channel1';
 mysql > show replica status for channel 'channel1' \G
-mysql > stop replica for channel 'channel1';
 ```
-We encounter the following error: Last_SQL_Error: Error executing row event: 'Unknown database 'mysql_innodb_cluster_metadata'' </br>
+
 
