@@ -3,7 +3,7 @@ We tested this design with the following scenarios:
 1. Switch node-1 to Group Replication, Switch node-2 to InnoDB Cluster and reverse replication from node2 to node-1
 2. Perform PRIMARY node failover on both node-1 and node-2
 3. Switch back node-1 to InnoDB Cluster, switch back node-2 to Group Replication and reverse back replication from node1 to node-2
-Caveat: Site Role Switch-over is mostly manual process and automation is not always a requirement. Moving operation to DR site is also a business decision and require DR declaration. </br>
+Caveat: Site Role Switch-over is mostly manual process and automation is not always a requirement. Moving operation to DR site is also a business decision and require DR declaration. </br></br>
 Assumption: Site role switch over requires application shutdown and no new transaction. Or else, it's considered unsafe. </br></br>
 The orchestration for Site switchover during DR exercise is specific for each organizations and normally documented as DR runbook. The runbook is what normally DR team follows to perform site switchover as part of DR exercise. 
 ## Role Switch (Node1 = Group Replication, Node2 = InnoDB Cluster)
