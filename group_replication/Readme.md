@@ -115,3 +115,10 @@ Using MySQL Shell, connect to PRIMARY node and run group_replication.addInstance
 ```
 mysqlsh > group_replication.addInstance("gradmin:grpass@node4:3306")
 ```
+## Use Case
+| Topic | Description |
+| ------|-------------|
+| [DR-Setup](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/DR-Setup) | Setup Group Replication for DR, while PROD uses InnoDB Cluster |
+| [DR-Scenario-1](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/1-DR-Schenario) | Primary Node Failover Handling on PROD and DR |
+| [DR-Scenario-2](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/2-DR-Scenario) | Site Switchover and Switchback between PROD and DR |
+| [DR-Scenario-3](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/3-DR-Scenario) | Disaster Recovery Handling |
