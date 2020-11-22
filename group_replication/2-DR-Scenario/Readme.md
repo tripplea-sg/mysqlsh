@@ -38,8 +38,8 @@ Connect to 3307 on Node1 (PRIMARY), and create replication to MySQL Router
 ```
 mysql -uroot -h127.0.0.1 -P3307
 mysql > change master to master_user='repl', master_password='repl', master_host='test-drive-preparation', master_port=6446, master_auto_position=1, master_ssl=1, get_master_public_key=1 for channel 'channel1';
-start replica for channel 'channel1';
-show replica status for channel 'channel1' \G
+mysql > start replica for channel 'channel1';
+mysql > show replica status for channel 'channel1' \G
 ```
 #### E. Let's Test
 Connect to 3307 on Node2 (PRIMARY) and create transaction:
@@ -48,6 +48,45 @@ mysql -uroot -h127.0.0.1 -P3307
 mysql > insert into test.test values (8);
 ```
 On Node1, check the records on all nodes:
+```
+mysql -uroot -h127.0.0.1 -P3306 -e "select * from test.test"
+mysql -uroot -h127.0.0.1 -P3307 -e "select * from test.test"
+mysql -uroot -h127.0.0.1 -P3308 -e "select * from test.test"
+```
+Record is successfully replicated from Node2 to Node1.
+#### F. Let's test further with PRIMARY node failover on Node2 (InnoDB Cluster)
+Change Primary Node of InnoDB Cluster on Node 2 from 3307 back to 3306
+```
+mysqlsh gradmin:grpass@localhost:3307 -- cluster setPrimaryInstance gradmin:grpass@localhost:3306
+```
+Connect to 3306 on Node2 and create transaction:
+```
+mysql -uroot -h127.0.0.1 -P3306 -e "insert into test.test values (9)"
+```
+On node1, check the records on all nodes:
+```
+mysql -uroot -h127.0.0.1 -P3306 -e "select * from test.test"
+mysql -uroot -h127.0.0.1 -P3307 -e "select * from test.test"
+mysql -uroot -h127.0.0.1 -P3308 -e "select * from test.test"
+```
+Record is successfully replicated from Node2 to Node1.
+#### G. Further test with PRIMARY node failover on Node 1 (Group Replication)
+Change Primary Node of Group Replication on Node 1 from 3307 to 3306
+```
+mysql -uroot -h127.0.0.1 -P3307 -e "restart"
+```
+Still on Node2, connect to instance 3306 and activate replication:
+```
+mysql -uroot -h127.0.0.1 -P3306
+mysql > change master to master_user='repl', master_password='repl', master_host='test-drive-preparation', master_port=6446, master_auto_position=1, master_ssl=1, get_master_public_key=1 for channel 'channel1';
+mysql > start replica for channel 'channel1';
+mysql > show replica status for channel 'channel1' \G
+```
+Connect to 3306 on Node2 and create transaction:
+```
+mysql -uroot -h127.0.0.1 -P3306 -e "insert into test.test values (10)"
+```
+On node1, check the records on all nodes:
 ```
 mysql -uroot -h127.0.0.1 -P3306 -e "select * from test.test"
 mysql -uroot -h127.0.0.1 -P3307 -e "select * from test.test"
