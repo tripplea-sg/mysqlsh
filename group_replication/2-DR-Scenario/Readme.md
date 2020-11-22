@@ -163,5 +163,4 @@ On Node 2 (3306), start replication channel
 start replica for channel 'channel1';
 show replica status for channel 'channel1' \G
 ```
-```
-```
+
