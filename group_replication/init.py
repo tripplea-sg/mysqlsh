@@ -152,6 +152,7 @@ def addInstance(connectionStr):
        result = remote_session.run_sql("INSTALL PLUGIN group_replication SONAME 'group_replication.so';")
 
     result = remote_session.run_sql("set sql_log_bin=off")
+    result = remote_session.run_sql("set global super_read_only=off")
     result = remote_session.run_sql("drop database if exists mysql_innodb_cluster_metadata;")
     result = remote_session.run_sql("set sql_log_bin=on")
     
