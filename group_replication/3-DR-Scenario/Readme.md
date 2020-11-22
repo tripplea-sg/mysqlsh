@@ -38,7 +38,15 @@ On Node1, start InnoDB Cluster
 mysqlsh gradmin:grpass@test-929103:3306
 mysqlsh > dba.rebootClusterFromCompleteOutage()
 ```
-Change to Group Replication
+Change this InnoDB Cluster on Node1 to Group Replication
 ```
 mysqlsh > group_replication.adoptFromIC()
 ```
+Start Replication directly to PRIMARY node of InnoDB Cluster on Node2 (use replication filter until data is sync.)
+```
+change master to master_user='repl', master_password='repl', master_host='test-drive-preparation', master_port=3306, master_auto_position=1, master_ssl=1, get_master_public_key=1 for channel 'channel1';
+change replication filter replicate_ignore_db=(mysql_innodb_cluster_metadata) for channel 'channel1';
+start replica for channel 'channel1';
+```
+## Migrate InnoDB Cluster Metadata from InnoDB Cluster on Node2 to Group Replication on Node1
+This step is optional. The reason is Group Replication on Node1 does not have mysql_innodb_cluster_metadata schema from InnoDB Cluster on Node2, hence replication filter is required. If we want to remove replication filter, then we need to migrate mysql_innodb_cluster_metadata schema from Node2 (InnoDB Cluster) to Node 1 (Group Replication)
