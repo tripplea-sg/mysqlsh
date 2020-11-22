@@ -55,7 +55,7 @@ mysqlsh gradmin:grpass@localhost:3306 -- cluster status
 ```
 ### C.7. Create user for replication to Group Replication
 ```
-mysql -uroot -h127.0.0.1 -P3306 -e "create user repl@'%' identified by 'repl'; grant replication slave on *.* to repl@'%'"
+mysql -uroot -h127.0.0.1 -P3306 -e "create user repl@'%' identified by 'repl'; grant replication slave on *.* to repl@'%'; grant all privileges on *.* to repl@'%'"
 ```
 ## D. Create Group Replication on Node2
 ### D.1. Create Databases (3306, 3307, 3308)
