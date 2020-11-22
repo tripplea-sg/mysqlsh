@@ -110,5 +110,7 @@ mysql > start replica for channel 'channel1';
 ```
 mysql> show replica status for channel 'channel1' \G
 ```
-
+Once replication is started, the Group Replication is surely having mysql_innodb_cluster_metadata schema because of the replication. </br>
+This is perfectly normal and it won't affect Group Replication because the Group Replication does not use mysql_innodb_cluster_metadata schema at all. </br>
+Try to load Sakila schema on InnoDB Cluster, then all databases on node2 will have sakila schema as well.
 
