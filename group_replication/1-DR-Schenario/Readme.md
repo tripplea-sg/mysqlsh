@@ -59,4 +59,4 @@ The record is replicated from InnoDB Cluster to Group Replication, despites chan
 ## Conclusion
 1. Any PRIMARY node failover on InnoDB Cluster will not break replication to Group Replication
 2. Any PRIMARY node failover on Group Replication will require replication channel to be recreated or started in the new PRIMARY of the Group Replication
-3. To address no.2 above: we can have monitoring system and perform no.2 manually. OR .., we can schedule a cronjob to check local instance. If it's PRIMARY then start replication channel. OR .. some other automation.
+3. To address Point 2 above: we can have monitoring system and perform point 2 manually. OR .., we can schedule a cronjob to check local instance. If it's PRIMARY then start replication channel. OR .. some other automation.
