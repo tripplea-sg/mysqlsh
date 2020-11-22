@@ -168,4 +168,4 @@ How to perform site role switchover:
 3. Convert InnoDB Cluster to Group Replication using MySQL Shell
 4. Stop replica and convert Group Replication to InnoDB Cluster using MySQL Shell
 5. Configure replication from InnoDB Cluster to Group Replication
-Remember that site role switchover is planned activity, thus all applications are expected to be inactive and no new records are coming.
+</br> Remember that site role switchover is planned activity, thus all applications are expected to be inactive and no new records are coming.
