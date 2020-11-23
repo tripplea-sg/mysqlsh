@@ -122,3 +122,7 @@ mysqlsh > group_replication.addInstance("gradmin:grpass@node4:3306")
 | [DR-Scenario-1](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/1-DR-Schenario) | Primary Node Failover Handling on PROD and DR |
 | [DR-Scenario-2](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/2-DR-Scenario) | Site Switchover and Switchback between PROD and DR |
 | [DR-Scenario-3](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/3-DR-Scenario) | Disaster Recovery Handling |
+| [Automation](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/Future-Development) | IC to GR Replication Broker |
+
+
+
