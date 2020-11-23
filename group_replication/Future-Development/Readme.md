@@ -7,3 +7,4 @@ So, using the same concept, all scripts here are actually able to be orchestrate
 4. Broker will have adminAPI to orchestrate site switchover
 5. Broker will have adminAPI to orchestrate DR scenario
 6. Using only MySQL Shell and a MySQL instance for repository
+![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/DR-Setup/Screenshot%202020-11-22%20at%209.15.08%20AM.png)
