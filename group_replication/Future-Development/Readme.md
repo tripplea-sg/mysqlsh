@@ -7,4 +7,6 @@ So, using the same concept, all scripts here are actually able to be orchestrate
 4. Broker will have adminAPI to orchestrate site switchover
 5. Broker will have adminAPI to orchestrate DR scenario
 6. Using only MySQL Shell and a MySQL instance for repository
+7. Broker is optional. Replication from IC to GR is still direct, and does not require a Broker to be up and running
+8. Broker is only for orchestration and better management
 ![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/Future-Development/Screenshot%202020-11-23%20at%208.47.06%20AM.png)
