@@ -6,4 +6,4 @@ So, using the same concept, all scripts here are actually able to be orchestrate
 3. Broker does not contain any data, so expected to be very small and easy to maintain (backup / restore)
 4. Broker will have adminAPI to orchestrate site switchover
 5. Broker will have adminAPI to orchestrate DR scenario
-6. Using only MySQL Shell
+6. Using only MySQL Shell and a MySQL instance for repository
