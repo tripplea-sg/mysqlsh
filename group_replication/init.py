@@ -53,6 +53,8 @@ def status():
 def i_check_local_role():
     clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
     result = i_run_sql("select member_role from performance_schema.replication_group_members where channel_name='group_replication_applier' and concat(member_host,':',member_port)='" + hostname + ":" + port + "'","[']",False)
+    if len(result) == 0:
+        result = i_run_sql("select member_role from performance_schema.replication_group_members where channel_name='group_replication_applier' and concat(member_host,':',member_port)='127.0.0.1:" + port + "'","[']",False)
     return result[0]
 
 def i_start_gr(isPRIMARY):
@@ -130,6 +132,8 @@ def i_get_host_port(connectionStr):
 def setPrimaryInstance(connectionStr):
     connectionStr = i_get_host_port(connectionStr)
     new_primary = i_run_sql("SELECT member_id FROM performance_schema.replication_group_members where channel_name='group_replication_applier' and concat(member_host,':',member_port)='" + connectionStr + "'","[']",False)
+    if len(new_primary) == 0:
+        new_primary = i_run_sql("SELECT member_id FROM performance_schema.replication_group_members where channel_name='group_replication_applier' and concat(member_host,':',member_port)='127.0.0.1:" + str(shell.parse_uri(connectionStr)['port']) +"'","[']",False)
     result = i_run_sql("select group_replication_set_as_primary('" + new_primary[0] + "')","'",False)
     return status()
 
