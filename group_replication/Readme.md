@@ -74,7 +74,7 @@ mysqlsh > group_replication.status()
 Let say all nodes are down. Start all nodes, and run rebootGRFromCompleteOutage below from one of the nodes:
 ```
 mysqlsh gradmin:grpass@node2:3306
-mysqlsh > group_replication.rebootGRFromCompleteOutage("node1:3306,node2:3306,node3:3306")
+mysqlsh > group_replication.rebootGRFromCompleteOutage()
 ```
 Key-in the cluster Admin Password. </br>
 Check group replication status
@@ -86,7 +86,7 @@ This is because system variable group_replication_start_on_boot is set to ON.
 ## How to convert Group Replication to InnoDB Cluster
 Let say we want to run as InnoDB Cluster instead of Group Replication, then login to PRIMARY node and run below:
 ```
-mysqlsh > group_replication.convertToIC('<any_cluster_name>')
+mysqlsh > group_replication.convertToIC('mycluster')
 ```
 Check InnoDB Cluster status as follow:
 ```
@@ -101,38 +101,18 @@ mysqlsh > group_replication.adoptFromIC()
 ```
 ## How to add additional node to existing Group Replication
 If we have a new database, let say node4:3306, and we want to add this database to the group. </br>
-In future, I might work on how to automate the following processes. It's possible to build function on this.
 ### A. Configure Instance Node4
 Connect to Node4 using mysqlsh and run configure-instance
 ```
 mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3306 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
 ```
-### B. Clone from PRIMARY node
-On PRIMARY node:
-```
-mysql > install plugin clone soname 'mysql_clone.so';
-mysql > create user clone@'%' identified by 'clone';
-mysql > grant backup_admin on *.* to clone@'%';
-```
-On Node4:
-```
-mysql > install plugin clone soname 'mysql_clone.so';
-mysql > set global clone_valid_donor_list='node2:3306';
-mysql > clone instance from clone@node2:3306 identified by 'clone';
-```
-Reconnect to Node4, and uninstall clone plugin
-```
-mysql > uninstall plugin clone;
-```
-Reconnect to PRIMARY, and uninstall clone plugin
-```
-mysql > uninstall plugin clone;
-```
-### C. Add Instance Node4
+### B. Add Instance Node4
 Using MySQL Shell, connect to PRIMARY node and run group_replication.addInstance()
 ```
 mysqlsh > group_replication.addInstance("gradmin:grpass@node4:3306")
+Please select a recovery method [C]lone/[I]ncremental recovery/[A]bort (default Clone): 
 ```
+Choose "C" for clone or "I" for incremental.
 ## Use Case
 | Topic | Description |
 | ------|-------------|
