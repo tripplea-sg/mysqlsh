@@ -1,27 +1,26 @@
 # Disaster Recovery Setup with Replication 
-## A. Schenario:
+## A. Scenario:
 1. Two Data Center: DC1 and DC2
 2. DC1 runs InnoDB Cluster
 3. DC2 runs Group Replication
 4. Asynchronous Replication from InnoDB Cluster to Group Replication
 5. Router on DC2 for Group Replication to connect to InnoDB Cluster
 ## B. Environment to simulate
-![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/DR-Setup/Screenshot%202020-11-22%20at%209.15.08%20AM.png)
 1. Two Compute Node in OCI
 2. One Compute Node for InnoDB Cluster, and the other one for Group Replication
 ```
-node1
+DC1
 IP Address  : 10.0.0.171
 Hostname    : test-929103
 
-node2
+DC2
 IP Address  : 10.0.0.88
 Hostname    : test-drive-preparation
 ```
 Requirement: </br>
 All nodes have to be restarted with skip-slave-start. The best way is to put skip-slave-start on Option files.
 3. All MySQL instances are on MySQL 8.0.22
-## C. Create InnoDB Cluster on Node1
+## C. Create InnoDB Cluster on DC1
 ### C.1. Create Databases (3306, 3307, 3308)
 ```
 mysqld --defaults-file=3306.cnf --initialize-insecure
@@ -57,7 +56,7 @@ mysqlsh gradmin:grpass@localhost:3306 -- cluster status
 ```
 mysql -uroot -h127.0.0.1 -P3306 -e "create user repl@'%' identified by 'repl'; grant replication slave on *.* to repl@'%'; grant all privileges on *.* to repl@'%'"
 ```
-## D. Create Group Replication on Node2
+## D. Create Group Replication on DC2
 ### D.1. Create Databases (3306, 3307, 3308)
 ```
 mysqld --defaults-file=3306.cnf --initialize-insecure
@@ -96,13 +95,13 @@ mysqlsh > group_replication.addInstance("gradmin:grpass@localhost:3308")
 mysqlsh > group_replication.status()
 ```
 ## E. Setup Replication between InnoDB Cluster to Group Replication
-### E.1. Setup Router on Node1 Pointing to InnoDB Cluster
+### E.1. Setup Router on DC1 Pointing to InnoDB Cluster
 ```
 mysqlrouter --bootstrap gradmin:grpass@test-929103:3306 --directory router
 router/start.sh
 ```
-### E.2. Setup Replication on Node2 Pointing to Router
-Connect to 3306 instance on Node 2
+### E.2. Setup Replication on DC2 Pointing to Router
+Connect to 3306 instance on DC2
 ```
 mysql -uroot -h127.0.0.1 -P3306
 mysql> change master to master_user='repl', master_password='repl', master_host='test-929103', master_port=6446, master_auto_position=1, master_ssl=1, get_master_public_key=1 for channel 'channel1';
