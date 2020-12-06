@@ -17,9 +17,6 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 def i_run_sql(query, strdel, getColumnNames):
-    import mysqlsh
-
-    shell = mysqlsh.globals.shell
     session = shell.get_session()
     result = session.run_sql(query)
     list_output = []
@@ -33,29 +30,23 @@ def i_run_sql(query, strdel, getColumnNames):
     return list_output
 
 def i_sess_identity(conn):
-    import mysqlsh
-    shell = mysqlsh.globals.shell
-
     clusterAdminPassword = ""
     if conn == "current":
-        session = shell.get_session()
+        x = shell.parse_uri(shell.get_session().get_uri())
+        hostname = (i_run_sql("select @@hostname;","[']", False))[0]
     else:
-        session = shell.connect(conn)
-        y = conn.replace(":"," ").replace("@", " ").split()
-        clusterAdminPassword = y[1]
-
-    clusterAdmin = session.get_uri().replace("mysql://","").replace("@"," ").replace(":"," ").split()[0]
-    # hostname = session.get_uri().replace("mysql://","").replace("@"," ").replace(":"," ").split()[1]
-    hostname = (i_run_sql("select @@hostname;","[`]'", False))[0]
-    port = session.get_uri().replace("mysql://","").replace("@"," ").replace(":"," ").split()[2]
-
-    return clusterAdmin, clusterAdminPassword, hostname, port
+        z = shell.get_session()
+        y = shell.open_session(conn)
+        shell.set_session(y)
+        hostname = (i_run_sql("select @@hostname;","[']", False))[0]
+        shell.set_session(z)
+        x = shell.parse_uri(conn)
+        clusterAdminPassword = x['password']
+    port = x['port']
+    clusterAdmin = x['user']
+    return clusterAdmin, clusterAdminPassword, hostname, str(port)
 
 def status():
-    import mysqlsh
-    shell = mysqlsh.globals.shell
-    session = shell.get_session()
-
     report = i_run_sql("SELECT * FROM performance_schema.replication_group_members where channel_name='group_replication_applier';","",True)
     return report
 
@@ -65,12 +56,10 @@ def i_check_local_role():
     return result[0]
 
 def i_start_gr(isPRIMARY):
-
     if isPRIMARY:
         result = i_run_sql("SET GLOBAL group_replication_bootstrap_group=ON","",False)
         result = i_run_sql("START GROUP_REPLICATION;", "", False)
         result = i_run_sql("SET GLOBAL group_replication_bootstrap_group=OFF","",False)
-
     else:
         result = i_run_sql("START GROUP_REPLICATION;","",False)
 
@@ -90,7 +79,8 @@ def i_comp_gtid(gtid1, gtid2):
 
 def i_get_gtid(connectionStr):
     if connectionStr != "current":
-        shell.connect(connectionStr)
+        x=shell.open_session(connectionStr)
+        shell.set_session(x)
     result = i_run_sql("show variables like 'gtid_executed'","[`]",False)
     return result[0].replace("'gtid_executed', '","").replace("'","")
 
@@ -120,11 +110,12 @@ def i_set_grseed_replicas(gr_seed, clusterAdmin, clusterAdminPassword):
             result = i_run_sql("CHANGE MASTER TO MASTER_USER='" + clusterAdmin + "', MASTER_PASSWORD='" + clusterAdminPassword + "' FOR CHANNEL 'group_replication_recovery';","[']",False)
 
 def i_set_all_grseed_replicas(gr_seed, new_gr_seed, clusterAdmin, clusterAdminPassword):
-    CA, CAP, hostname, port = i_sess_identity("current")
+    x=shell.get_session()
     for node in i_get_other_node():
-        shell.connect(clusterAdmin + ":" + clusterAdminPassword + "@" + node)
+        y=shell.open_session(clusterAdmin + ":" + clusterAdminPassword + "@" + node)
+        shell.set_session(y)
         i_set_grseed_replicas(new_gr_seed, clusterAdmin, clusterAdminPassword)
-    shell.connect(clusterAdmin + ":" + clusterAdminPassword + "@" + hostname + ":" + port)
+    shell.set_session(x) 
     i_set_grseed_replicas(new_gr_seed, clusterAdmin, clusterAdminPassword)
 
 def i_get_host_port(connectionStr):
@@ -143,54 +134,102 @@ def setPrimaryInstance(connectionStr):
     return status()
 
 def i_start_gr_all(connectionStr):
+    x=shell.get_session()
     clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity(connectionStr)
     i_start_gr(True)
     for node in i_get_other_node():
-        shell.connect(clusterAdmin + ":" + clusterAdminPassword + "@" + node)
+        y=shell.open_session(clusterAdmin + ":" + clusterAdminPassword + "@" + node)
+        shell.set_session(y)
         i_start_gr(False)
-    shell.connect(clusterAdmin + ":" + clusterAdminPassword + "@" + hostname + ":" + port)
+    shell.set_session(x)
 
 def i_create_or_add(ops, connectionStr, clusterAdmin, clusterAdminPassword, group_replication_group_name, group_replication_group_seeds):
-    if ops == "ADD":
-        cA, cAP, local_hostname, local_port = i_sess_identity("current")
-        print(clusterAdmin + ":" + clusterAdminPassword + "@" + connectionStr[:-1])
-        session = shell.connect(clusterAdmin + ":" + clusterAdminPassword + "@" + connectionStr[:-1])
-    result = i_run_sql("select count(1) from information_schema.plugins where plugin_name='group_replication'","[']", False)
-    if result[0] == "0":
-        result = i_run_sql("INSTALL PLUGIN group_replication SONAME 'group_replication.so';","[']",False)
+    if (ops == "ADD" or ops == "CLONE"):
+        CA, CAP, local_hostname, local_port = i_sess_identity("current")
+        x=shell.get_session()
+        y = shell.open_session(clusterAdmin + ":" + clusterAdminPassword + "@" + connectionStr[:-1])
+        shell.set_session(y)
+    i_install_plugin("group_replication", "group_replication.so")
     result = i_run_sql("set persist group_replication_group_name='" + group_replication_group_name + "'","[']",False)
     result = i_run_sql("set persist group_replication_start_on_boot='ON'","[']",False)
     result = i_run_sql("set persist group_replication_bootstrap_group=off","[']",False)
     result = i_run_sql("set persist group_replication_ssl_mode='REQUIRED'","[']",False)
     result = i_run_sql("set persist group_replication_local_address='" + connectionStr + "'","[']",False)
     i_set_grseed_replicas(group_replication_group_seeds, clusterAdmin, clusterAdminPassword)
+    if ops == "CLONE":
+        i_clone(local_hostname + ":" + local_port,clusterAdmin,clusterAdminPassword)
+        # i_remove_plugin("clone")
     if ops == "CREATE":
         i_start_gr(True)
     else:
-        i_start_gr(False)
-        session = shell.connect(clusterAdmin + ":" + clusterAdminPassword + "@" + local_hostname + ":" + local_port)
+        if ops == "ADD":
+            i_start_gr(False)
+        shell.set_session(x)
+        #if ops == "CLONE":
+        #    i_remove_plugin("clone")
     return status()
+
+def i_define_gr_name():
+    result = i_run_sql("select uuid()","[']",False)
+    return result[0]
+
+def i_get_gr_name():
+    result = i_run_sql("show variables like 'group_replication_group_name'","['group_replication_group_name'",False)
+    return result[0].strip(", '").strip("']")
+
+def i_install_plugin(plugin_name, plugin_file):
+    result = i_run_sql("select count(1) from information_schema.plugins where plugin_name='" + plugin_name + "'","[']", False)
+    if result[0] == "0":
+        result = i_run_sql("INSTALL PLUGIN " + plugin_name + " SONAME '" + plugin_file + "';","[']",False)
+
+def i_remove_plugin(plugin_name):
+    result = i_run_sql("select count(1) from information_schema.plugins where plugin_name='" + plugin_name + "'","[']", False)
+    if result[0] != "0":
+        result = i_run_sql("uninstall PLUGIN " + plugin_name + ";","[']",False)
+
+def i_clone(source, cloneAdmin, cloneAdminPassword):
+    import time
+    clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
+    i_install_plugin("clone", "mysql_clone.so")
+    result = i_run_sql("set global clone_valid_donor_list='" + source + "';","", False)
+    print("Clone database is started ...")
+    result = i_run_sql("clone instance from " + cloneAdmin + "@" + source + " identified by '" + cloneAdminPassword + "'", "", False)
+    time.sleep(10)
 
 def create():
     clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
     gr_seed = hostname + ":" + port + "1"
-    i_create_or_add("CREATE",gr_seed,clusterAdmin, clusterAdminPassword, "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", gr_seed)
+    i_create_or_add("CREATE",gr_seed,clusterAdmin, clusterAdminPassword, i_define_gr_name(), gr_seed)
     return status()
 
 def addInstance(connectionStr):
     clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
+    print("A new instance will be added to the Group Replication. Depending on the amount of data on the group this might take from a few seconds to several hours.")
+    print(" ")
     if (connectionStr.count(':') == 1):
-        clusterAdminPassword = str(input('Enter password for ' + connectionStr + ' : '))
+        clusterAdminPassword = shell.prompt('Please provide the password for ' + connectionStr + ': ',{"type":"password"})
     else:
         clusterAdminPassword = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[1]
-    old_gr_seed = i_get_gr_seed()
-    add_gr_seed = i_get_host_port(connectionStr) + "1"
-    if old_gr_seed.find(add_gr_seed) != -1:
-        new_gr_seed = old_gr_seed
+    clone_sts = shell.prompt("Please select a recovery method [C]lone/[I]ncremental recovery/[A]bort (default Clone): ")
+    if (clone_sts == "C" or clone_sts == "" or clone_sts == " "):
+        clone_sts = "CLONE"
     else:
-        new_gr_seed = old_gr_seed + "," + add_gr_seed
-    i_set_all_grseed_replicas(old_gr_seed, new_gr_seed, clusterAdmin, clusterAdminPassword)
-    i_create_or_add("ADD",add_gr_seed,clusterAdmin,clusterAdminPassword,"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", new_gr_seed)
+        if clone_sts == "I":
+            clone_sts = "ADD"
+        else:
+            clone_sts = "A"
+            print("Adding instance is aborted")
+    if clone_sts != "A":
+        old_gr_seed = i_get_gr_seed()
+        add_gr_seed = i_get_host_port(connectionStr) + "1"
+        if old_gr_seed.find(add_gr_seed) != -1:
+            new_gr_seed = old_gr_seed
+        else:
+            new_gr_seed = old_gr_seed + "," + add_gr_seed
+        if clone_sts == "CLONE":
+            i_install_plugin("clone", "mysql_clone.so")
+        i_set_all_grseed_replicas(old_gr_seed, new_gr_seed, clusterAdmin, clusterAdminPassword)
+        i_create_or_add(clone_sts,add_gr_seed,clusterAdmin,clusterAdminPassword,i_get_gr_name(), new_gr_seed)
     return status()
 
 def convertToIC(clusterName):
@@ -208,7 +247,7 @@ def adoptFromIC():
     msg_output = "FAILED - Instance is not a PRIMARY"
     if i_check_local_role() == "PRIMARY":
        clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
-       clusterAdminPassword = str(input('Enter Cluster Admin password: '))
+       clusterAdminPassword = shell.prompt('Please provide password for Cluster Admin: ',{"type":"password"})
        host_list = i_get_other_node()
        dba.get_cluster().dissolve({"interactive":False})
        create()
@@ -221,7 +260,8 @@ def adoptFromIC():
 
 def rebootGRFromCompleteOutage():
    clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
-   clusterAdminPassword = str(input('Enter Cluster Admin Password : '))
+   clusterAdminPassword = shell.prompt('Please provide password for Cluster Admin : ',{"type":"password"})
+   x=shell.get_session()
    local_gtid = i_get_gtid("current")
    process_sts = "Y"
    for node in i_get_other_node():
@@ -229,12 +269,15 @@ def rebootGRFromCompleteOutage():
        if i_comp_gtid(local_gtid, remote_gtid) != "1":
             process_sts = "N"
    if process_sts == "Y":
+       shell.set_session(x)
+       print("This node is suitable to start Group Replication")
+       print("Process may take a while ...")
        i_start_gr_all(clusterAdmin + ":" + clusterAdminPassword + "@" + hostname + ":" + port)
        print("Reboot Group Replication process is completed")
    else:
        print("Node was not a PRIMARY, try another node")
    return status()
-  
+
 if 'group_replication' in globals():
     global_obj = group_replication
 else:
@@ -270,6 +313,7 @@ else:
                                        ]
                                         }
                                       );
+
     shell.add_extension_object_member(global_obj,
                                       "setPrimaryInstance",
                                       setPrimaryInstance, {
@@ -295,6 +339,7 @@ else:
                                         }
                                         ] }
                                       );
+    
     shell.add_extension_object_member(global_obj,
                                       "adoptFromIC",
                                       adoptFromIC, {
