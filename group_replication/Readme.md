@@ -7,6 +7,19 @@ This method is distributed in the hope that it will be useful,
 </br> but WITHOUT ANY WARRANTY; without even the implied warranty of
 </br> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
+## Comparison
+
+| Purpose | InnoDB Cluster Command | Group Replication Command |
+| ------|-------------|---------------- |
+| Configure Instance | mysqlsh > dba.configureInstance() | mysqlsh > dba.configureInstance() |
+| Create / Deploy |  | mysqlsh > dba.createCluster('mycluster') | mysqlsh > group_replication.create() |
+| Add Instance | mysqlsh > cluster.addInstance() | mysqlsh > group_replication.addInstance() |
+| Check Status | mysqlsh > cluster.status() | mysqlsh > group_replication.status() |
+| Set Primary Instance | mysqlsh > cluster.setPrimaryInstance() | mysqlsh > group_replication.setPrimaryInstance() |
+| Startup  | mysqlsh > dba.rebootClusterFromCompleteOutage() | mysqlsh > group_replication.rebootGRFromCompleteOutage() |
+| Convert to InnoDB Cluster |   | mysqlsh > group_replication.convertToIC('mycluster') |
+| Convert from InnoDB Cluster to Group Replication |  | mmysqlsh > group_replication.adoptFromIC() |
+
 ## Plugin Installation
 1. Copy init.py
 2. Paste into $HOME/.mysqlsh/plugins/group_replication/init.py
