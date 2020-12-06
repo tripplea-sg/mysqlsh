@@ -103,16 +103,29 @@ def i_stop_other_replicas():
         for channelName in result:
             stop_other_replicas = i_run_sql("stop replica for channel '" + channelName + "'","",False)
 
+def i_check_group_replication_recovery():
+    result = i_run_sql("select count(1) from performance_schema.replication_connection_status where channel_name='group_replication_recovery'","[']", False)
+    return result[0]
+
 def i_get_gr_seed():
     result = i_run_sql("show variables like 'group_replication_group_seeds'","['group_replication_group_seeds'",False)
     return result[0].strip(", '").strip("']")
 
 def i_set_grseed_replicas(gr_seed, clusterAdmin, clusterAdminPassword):
     result = i_run_sql("set persist group_replication_group_seeds='" + gr_seed + "'","[']",False)
-    if clusterAdmin == "":
-       result = i_run_sql("CHANGE MASTER TO MASTER_USER='" + clusterAdmin + "' FOR CHANNEL 'group_replication_recovery';","[']",False) 
+    if clusterAdminPassword == "":
+        result = i_run_sql("CHANGE MASTER TO MASTER_USER='" + clusterAdmin + "' FOR CHANNEL 'group_replication_recovery';","[']",False) 
     else:
-       result = i_run_sql("CHANGE MASTER TO MASTER_USER='" + clusterAdmin + "', MASTER_PASSWORD='" + clusterAdminPassword + "' FOR CHANNEL 'group_replication_recovery';","[']",False)
+        if i_check_group_replication_recovery() == "0":
+            result = i_run_sql("CHANGE MASTER TO MASTER_USER='" + clusterAdmin + "', MASTER_PASSWORD='" + clusterAdminPassword + "' FOR CHANNEL 'group_replication_recovery';","[']",False)
+
+def i_set_all_grseed_replicas(gr_seed, new_gr_seed, clusterAdmin, clusterAdminPassword):
+    CA, CAP, hostname, port = i_sess_identity("current")
+    for node in i_get_other_node():
+        shell.connect(clusterAdmin + ":" + clusterAdminPassword + "@" + node)
+        i_set_grseed_replicas(new_gr_seed, clusterAdmin, clusterAdminPassword)
+    shell.connect(clusterAdmin + ":" + clusterAdminPassword + "@" + hostname + ":" + port)
+    i_set_grseed_replicas(new_gr_seed, clusterAdmin, clusterAdminPassword)
 
 def i_get_host_port(connectionStr):
     if (connectionStr.find("@") != -1):
@@ -170,9 +183,14 @@ def addInstance(connectionStr):
         clusterAdminPassword = str(input('Enter password for ' + connectionStr + ' : '))
     else:
         clusterAdminPassword = ((connectionStr.replace(":"," ")).replace("@", " ")).split()[1]
-    gr_seed = i_get_gr_seed() + "," + i_get_host_port(connectionStr) + "1"
-    i_set_grseed_replicas(gr_seed, clusterAdmin, clusterAdminPassword)
-    i_create_or_add("ADD",i_get_host_port(connectionStr) + "1",clusterAdmin,clusterAdminPassword,"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", gr_seed)
+    old_gr_seed = i_get_gr_seed()
+    add_gr_seed = i_get_host_port(connectionStr) + "1"
+    if old_gr_seed.find(add_gr_seed) != -1:
+        new_gr_seed = old_gr_seed
+    else:
+        new_gr_seed = old_gr_seed + "," + add_gr_seed
+    i_set_all_grseed_replicas(old_gr_seed, new_gr_seed, clusterAdmin, clusterAdminPassword)
+    i_create_or_add("ADD",add_gr_seed,clusterAdmin,clusterAdminPassword,"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", new_gr_seed)
     return status()
 
 def convertToIC(clusterName):
