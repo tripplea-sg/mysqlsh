@@ -12,7 +12,7 @@ This method is distributed in the hope that it will be useful,
 | Purpose | InnoDB Cluster Command | Group Replication Command |
 | ------|-------------|---------------- |
 | Configure Instance | mysqlsh > dba.configureInstance() | mysqlsh > dba.configureInstance() |
-| Create / Deploy |  | mysqlsh > dba.createCluster('mycluster') | mysqlsh > group_replication.create() |
+| Create / Deploy | mysqlsh > dba.createCluster('mycluster') | mysqlsh > group_replication.create() |
 | Add Instance | mysqlsh > cluster.addInstance() | mysqlsh > group_replication.addInstance() |
 | Check Status | mysqlsh > cluster.status() | mysqlsh > group_replication.status() |
 | Set Primary Instance | mysqlsh > cluster.setPrimaryInstance() | mysqlsh > group_replication.setPrimaryInstance() |
