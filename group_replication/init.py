@@ -47,8 +47,20 @@ def i_sess_identity(conn):
     return clusterAdmin, clusterAdminPassword, hostname, str(port)
 
 def status():
-    report = i_run_sql("SELECT * FROM performance_schema.replication_group_members where channel_name='group_replication_applier';","",True)
-    return report
+    print("Group Replication Member Status :")
+    return shell.get_session().run_sql("select * from performance_schema.replication_group_members where channel_name='group_replication_applier';")
+
+def showChannel():
+    return shell.get_session().run_sql("Select a.channel_name, a.host, a.port, a.user, b.service_state from performance_schema.replication_connection_configuration a, performance_schema.replication_connection_status b where a.channel_name=b.channel_name")
+
+def startChannel(channel_name):
+    shell.get_session().run_sql("SET GLOBAL event_scheduler = OFF;")
+    shell.get_session().run_sql("alter event mysql_innodb_cluster_metadata." + channel_name + " enable;")
+    shell.get_session().run_sql("SET GLOBAL event_scheduler = ON;")
+
+def stopChannel(channel_name):
+    shell.get_session().run_sql("alter event mysql_innodb_cluster_metadata." + channel_name + " disable;")
+    shell.get_session().run_sql("stop replica for channel '" + channel_name + "'")
 
 def i_check_local_role():
     clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
@@ -284,6 +296,8 @@ def rebootGRFromCompleteOutage():
    return status()
 
 def replicateFromIC(channel_name, router_host, router_port_number):
+    import time
+
     x=shell.get_session()
     router_port = str(router_port_number)
     clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
@@ -298,6 +312,8 @@ def replicateFromIC(channel_name, router_host, router_port_number):
     result = i_run_sql("change master to master_host='" + router_host + "', master_port=" + router_port + ", master_user='" + clusterAdmin + "', master_password='" + clusterAdminPassword + "', master_ssl=1, master_auto_position=1, get_master_public_key=1 for channel '" + channel_name + "'", "", False)
     print("Starting replication from " + router_host + ":" + router_port + " ...")
     result = i_run_sql("start replica for channel '" + channel_name + "'", "", False)
+    time.sleep(10)
+    result = i_run_sql("create event mysql_innodb_cluster_metadata." + channel_name + " ON SCHEDULE every 2 second do start replica for channel '" + channel_name + "';", "", False)
     return print("All nodes have this replication channel")
 
 if 'group_replication' in globals():
@@ -397,4 +413,40 @@ else:
                                             "brief":"InnoDB Cluster router port"
                                         }
                                         ] }
+                                      );
+
+    
+    shell.add_extension_object_member(global_obj,
+                                      "showChannel",
+                                      showChannel, {
+                                       "brief":"Show channels' status",
+                                        }
+                                      );
+    
+    shell.add_extension_object_member(global_obj,
+                                      "startChannel",
+                                      startChannel, {
+                                       "brief":"Start Replication Channel",
+                                       "parameters": [
+                                       {
+                                            "name":"channel_name",
+                                            "type":"string",
+                                            "brief":"channel name"
+                                        }
+                                       ]
+                                        }
+                                      );
+
+    shell.add_extension_object_member(global_obj,
+                                      "stopChannel",
+                                      stopChannel, {
+                                       "brief":"Stop Replication Channel",
+                                       "parameters": [
+                                       {
+                                            "name":"channel_name",
+                                            "type":"string",
+                                            "brief":"channel name"
+                                        }
+                                       ]
+                                        }
                                       );
