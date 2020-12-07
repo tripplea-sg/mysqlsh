@@ -114,14 +114,6 @@ mysqlsh > group_replication.addInstance("gradmin:grpass@node4:3306")
 Please select a recovery method [C]lone/[I]ncremental recovery/[A]bort (default Clone): 
 ```
 Choose "C" for clone or "I" for incremental.
-## Use Case
-| Topic | Description |
-| ------|-------------|
-| [DR-Setup](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/DR-Setup) | Setup Group Replication for DR, while PROD uses InnoDB Cluster |
-| [DR-Scenario-1](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/1-DR-Schenario) | Primary Node Failover Handling on PROD and DR |
-| [DR-Scenario-2](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/2-DR-Scenario) | Site Switchover and Switchback between PROD and DR |
-| [DR-Scenario-3](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/3-DR-Scenario) | Disaster Recovery Handling |
-| [Automation](https://github.com/tripplea-sg/mysqlsh/tree/main/group_replication/Future-Development) | IC to GR Replication Broker |
 
 
 
