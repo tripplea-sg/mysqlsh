@@ -197,6 +197,7 @@ def i_clone(source, cloneAdmin, cloneAdminPassword):
     i_install_plugin("clone", "mysql_clone.so")
     result = i_run_sql("set global clone_valid_donor_list='" + source + "';","", False)
     print("Clone database is started ...")
+    result = i_run_sql("set global super_read_only=off;","", False)
     result = i_run_sql("clone instance from " + cloneAdmin + "@" + source + " identified by '" + cloneAdminPassword + "'", "", False)
     time.sleep(10)
 
@@ -282,6 +283,23 @@ def rebootGRFromCompleteOutage():
        print("Node was not a PRIMARY, try another node")
    return status()
 
+def replicateFromIC(channel_name, router_host, router_port_number):
+    x=shell.get_session()
+    router_port = str(router_port_number)
+    clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
+    clusterAdminPassword = shell.prompt('Please provide password for Cluster Admin : ',{"type":"password"})
+    for node in i_get_other_node():
+        print("Configure replication channel on '" + node)
+        y=shell.open_session(clusterAdmin + ":" + clusterAdminPassword + "@" + node)
+        shell.set_session(y)
+        result = i_run_sql("change master to master_host='" + router_host + "', master_port=" + router_port + ", master_user='" + clusterAdmin + "', master_password='" + clusterAdminPassword + "', master_ssl=1, master_auto_position=1, get_master_public_key=1 for channel '" + channel_name + "'", "", False) 
+    shell.set_session(x)
+    print("Configure replication channel on " + hostname + ":" + port)
+    result = i_run_sql("change master to master_host='" + router_host + "', master_port=" + router_port + ", master_user='" + clusterAdmin + "', master_password='" + clusterAdminPassword + "', master_ssl=1, master_auto_position=1, get_master_public_key=1 for channel '" + channel_name + "'", "", False)
+    print("Starting replication from " + router_host + ":" + router_port + " ...")
+    result = i_run_sql("start replica for channel '" + channel_name + "'", "", False)
+    return print("All nodes have this replication channel")
+
 if 'group_replication' in globals():
     global_obj = group_replication
 else:
@@ -356,4 +374,27 @@ else:
                                       rebootGRFromCompleteOutage, {
                                        "brief":"Startup Group Replication",
                                         }
+                                      );
+
+    shell.add_extension_object_member(global_obj,
+                                      "replicateFromIC",
+                                      replicateFromIC, {
+                                       "brief":"Setup replication from InnoDB Cluster router",
+                                       "parameters": [
+                                        {
+                                            "name":"channel_name",
+                                            "type":"string",
+                                            "brief":"Any name for your channel_name"
+                                        },
+                                        {
+                                            "name":"router_host",
+                                            "type":"string",
+                                            "brief":"InnoDB Cluster router host"
+                                        },
+                                        {
+                                            "name":"router_port",
+                                            "type":"integer",
+                                            "brief":"InnoDB Cluster router port"
+                                        }
+                                        ] }
                                       );
