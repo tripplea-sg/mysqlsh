@@ -17,6 +17,8 @@ This method is distributed in the hope that it will be useful,
 | Check Status | mysqlsh > cluster.status() | mysqlsh > group_replication.status() |
 | Set Primary Instance | mysqlsh > cluster.setPrimaryInstance('new_primary_node') | mysqlsh > group_replication.setPrimaryInstance('new_primary_node') |
 | Startup  | mysqlsh > dba.rebootClusterFromCompleteOutage() | mysqlsh > group_replication.rebootGRFromCompleteOutage() |
+| SetOption | mysqlsh > cluster.setOptions(<option>) | |
+| Set Instance Option | mysqlsh > cluster.setInstanceOptions(<option>) | |
 | Convert to InnoDB Cluster | mysqlsh > dba.create_cluster('clusterName', {"adoptFromGR":True})  | mysqlsh > group_replication.convertToIC('cluster_name') |
 | Convert from InnoDB Cluster to Group Replication |  | mysqlsh > group_replication.adoptFromIC() |
 | Set replication from InnoDB Cluster | | mysqlsh > group_replication.replicateFromIC('channel_name','router_host',router_port) |
