@@ -53,10 +53,12 @@ mysqlsh > group_replication.create()
 Still on MySQL Shell, add Node2:
 ```
 mysqlsh > group_replication.addInstance("gradmin:grpass@node2:3306")
+Please select a recovery method [C]lone/[I]ncremental recovery/[A]bort (default Clone): 
 ```
-Still on MySQL Shell, add Node2:
+Still on MySQL Shell, add Node3:
 ```
 mysqlsh > group_replication.addInstance("gradmin:grpass@node3:3306")
+Please select a recovery method [C]lone/[I]ncremental recovery/[A]bort (default Clone): 
 ```
 View group replication status to ensure all nodes are ONLINE
 ```
@@ -100,20 +102,5 @@ Login to PRIMARY node and run below:
 ```
 mysqlsh > group_replication.adoptFromIC()
 ```
-## How to add additional node to existing Group Replication
-If we have a new database, let say node4:3306, and we want to add this database to the group. </br>
-### A. Configure Instance Node4
-Connect to Node4 using mysqlsh and run configure-instance
-```
-mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3306 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
-```
-### B. Add Instance Node4
-Using MySQL Shell, connect to PRIMARY node and run group_replication.addInstance()
-```
-mysqlsh > group_replication.addInstance("gradmin:grpass@node4:3306")
-Please select a recovery method [C]lone/[I]ncremental recovery/[A]bort (default Clone): 
-```
-Choose "C" for clone or "I" for incremental.
-
 
 
