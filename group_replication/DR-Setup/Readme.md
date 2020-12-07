@@ -52,10 +52,6 @@ mysqlsh gradmin:grpass@localhost:3306 -- cluster add-instance gradmin:grpass@loc
 ```
 mysqlsh gradmin:grpass@localhost:3306 -- cluster status
 ```
-### C.7. Create user for replication to Group Replication
-```
-mysql -uroot -h127.0.0.1 -P3306 -e "create user repl@'%' identified by 'repl'; grant replication slave on *.* to repl@'%'; grant all privileges on *.* to repl@'%'"
-```
 ## D. Create Group Replication on DC2
 ### D.1. Create Databases (3306, 3307, 3308)
 ```
@@ -90,7 +86,7 @@ mysqlsh > group_replication.create()
 mysqlsh > group_replication.addInstance("gradmin:grpass@localhost:3307")
 mysqlsh > group_replication.addInstance("gradmin:grpass@localhost:3308")
 ```
-### D.6. Check Cluster Status
+### D.6. Check Group Replication Status
 ```
 mysqlsh > group_replication.status()
 ```
@@ -103,10 +99,7 @@ router/start.sh
 ### E.2. Setup Replication on DC2 Pointing to Router
 Connect to 3306 instance on DC2
 ```
-mysql -uroot -h127.0.0.1 -P3306
-mysql> change master to master_user='repl', master_password='repl', master_host='test-929103', master_port=6446, master_auto_position=1, master_ssl=1, get_master_public_key=1 for channel 'channel1';
-mysql > start replica for channel 'channel1';
-mysql> grant all privileges on *.* to repl@'%';
+mysqlsh > group_replication.replicateFromIC('channel1','test-929103',6446)
 ```
 ### E.3. Show Replication Channel Status
 ```
