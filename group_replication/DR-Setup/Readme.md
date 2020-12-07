@@ -103,7 +103,15 @@ mysqlsh > group_replication.replicateFromIC('channel1','test-929103',6446)
 ```
 ### E.3. Show Replication Channel Status
 ```
-mysql> show replica status for channel 'channel1' \G
+mysqlsh > group_replication.showChannel()
+```
+### E.4. Stop Replication Channel
+```
+mysqlsh > group_replication.stopChannel('channel1')
+```
+### E.5. Start Replication Channel
+```
+mysqlsh > group_replication.startChannel('channel1')
 ```
 Once replication is started, the Group Replication is surely having mysql_innodb_cluster_metadata schema because of the replication. </br>
 This is perfectly normal and it won't affect Group Replication because the Group Replication does not use mysql_innodb_cluster_metadata schema at all. </br>
