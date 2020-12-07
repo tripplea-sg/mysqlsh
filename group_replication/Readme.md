@@ -12,13 +12,14 @@ This method is distributed in the hope that it will be useful,
 | Purpose | InnoDB Cluster Command | Group Replication Command |
 | ------|-------------|---------------- |
 | Configure Instance | mysqlsh > dba.configureInstance() | mysqlsh > dba.configureInstance() |
-| Create / Deploy | mysqlsh > dba.createCluster('mycluster') | mysqlsh > group_replication.create() |
-| Add Instance | mysqlsh > cluster.addInstance() | mysqlsh > group_replication.addInstance() |
+| Create / Deploy | mysqlsh > dba.createCluster('cluster_name') | mysqlsh > group_replication.create() |
+| Add Instance | mysqlsh > cluster.addInstance('new_node') | mysqlsh > group_replication.addInstance('new_node') |
 | Check Status | mysqlsh > cluster.status() | mysqlsh > group_replication.status() |
-| Set Primary Instance | mysqlsh > cluster.setPrimaryInstance() | mysqlsh > group_replication.setPrimaryInstance() |
+| Set Primary Instance | mysqlsh > cluster.setPrimaryInstance('new_primary_node') | mysqlsh > group_replication.setPrimaryInstance('new_primary_node') |
 | Startup  | mysqlsh > dba.rebootClusterFromCompleteOutage() | mysqlsh > group_replication.rebootGRFromCompleteOutage() |
-| Convert to InnoDB Cluster |   | mysqlsh > group_replication.convertToIC('mycluster') |
-| Convert from InnoDB Cluster to Group Replication |  | mmysqlsh > group_replication.adoptFromIC() |
+| Convert to InnoDB Cluster |   | mysqlsh > group_replication.convertToIC('cluster_name') |
+| Convert from InnoDB Cluster to Group Replication |  | mysqlsh > group_replication.adoptFromIC() |
+| Set replication from InnoDB Cluster | | mysqlsh > group_replication.replicateFromIC('channel_name','router_host','router_port') |
 
 ## Plugin Installation
 1. Copy init.py
