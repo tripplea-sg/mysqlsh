@@ -19,7 +19,7 @@ This method is distributed in the hope that it will be useful,
 | Startup  | mysqlsh > dba.rebootClusterFromCompleteOutage() | mysqlsh > group_replication.rebootGRFromCompleteOutage() |
 | Convert to InnoDB Cluster |   | mysqlsh > group_replication.convertToIC('cluster_name') |
 | Convert from InnoDB Cluster to Group Replication |  | mysqlsh > group_replication.adoptFromIC() |
-| Set replication from InnoDB Cluster | | mysqlsh > group_replication.replicateFromIC('channel_name','router_host','router_port') |
+| Set replication from InnoDB Cluster | | mysqlsh > group_replication.replicateFromIC('channel_name','router_host',router_port) |
 
 ## Plugin Installation
 1. Copy init.py
