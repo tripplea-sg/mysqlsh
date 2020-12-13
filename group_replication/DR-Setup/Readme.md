@@ -91,29 +91,41 @@ mysqlsh > group_replication.addInstance("gradmin:grpass@localhost:3308")
 mysqlsh > group_replication.status()
 ```
 ## E. Setup Replication between InnoDB Cluster to Group Replication
-### E.1. Setup Router on DC1 Pointing to InnoDB Cluster
+### E.1. Setup Router pointing to InnoDB Cluster
 ```
 mysqlrouter --bootstrap gradmin:grpass@test-929103:3306 --directory router
 router/start.sh
 ```
-### E.2. Setup Replication on DC2 Pointing to Router
-Connect to 3306 instance on DC2
+### E.2. Setup replication user on InnoDB Cluster
+Connect to 3306 instance on DC1 using root
 ```
-mysqlsh > group_replication.replicateFromIC('channel1','test-929103',6446)
+mysqlsh > group_replication.innodb_cluster_create_repl_usr('repl')
 ```
-### E.3. Show Replication Channel Status
+### E.3. Setup replication 
+Connect to 3306 instance on DC2 using gradmin
+```
+mysqlsh > group_replication.addChannel('chanenl1','{router_host}',{router_port})
+```
+### E.4. Show Replication Channel Status
 ```
 mysqlsh > group_replication.showChannel()
 ```
-### E.4. Stop Replication Channel
+### To Stop Replication Channel
 ```
 mysqlsh > group_replication.stopChannel('channel1')
 ```
-### E.5. Start Replication Channel
+### To Start Replication Channel
 ```
 mysqlsh > group_replication.startChannel('channel1')
 ```
 Once replication is started, the Group Replication is surely having mysql_innodb_cluster_metadata schema because of the replication. </br>
 This is perfectly normal and it won't affect Group Replication because the Group Replication does not use mysql_innodb_cluster_metadata schema at all. </br>
 Try to load Sakila schema on InnoDB Cluster, then all databases on node2 will have sakila schema as well.
+## F. Flip Cluster Roles
+In this scenario, Group Replication will become InnoDB Cluster and InnoDB Cluster will become Group Replication </br>
+All replication channels are automatically handled </br>
+Connect to the Group Replication as cluster admin user:
+```
+mysqlsh > group_replication.flipClusterRole('mycluster')
+```
 
