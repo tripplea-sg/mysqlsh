@@ -121,7 +121,7 @@ mysqlsh > group_replication.startChannel('channel1')
 Once replication is started, the Group Replication is surely having mysql_innodb_cluster_metadata schema because of the replication. </br>
 This is perfectly normal and it won't affect Group Replication because the Group Replication does not use mysql_innodb_cluster_metadata schema at all. </br>
 Try to load Sakila schema on InnoDB Cluster, then all databases on node2 will have sakila schema as well.
-## F. Flip Cluster Roles
+### E5. Flip Cluster Roles
 In this scenario, Group Replication will become InnoDB Cluster and InnoDB Cluster will become Group Replication </br>
 All replication channels are automatically handled </br>
 Connect to the Group Replication as cluster admin user:
