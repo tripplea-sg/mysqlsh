@@ -19,14 +19,16 @@ This method is distributed in the hope that it will be useful,
 | Startup  | mysqlsh > dba.rebootClusterFromCompleteOutage() | mysqlsh > group_replication.rebootGRFromCompleteOutage() |
 | SetOption | mysqlsh > cluster.setOptions(<option>) | |
 | Set Instance Option | mysqlsh > cluster.setInstanceOptions(<option>) | |
+| Remove Instance | mysqlsh > cluster.removeInstance('instance') | |
+| Dissolve cluster | mysqlsh > cluster.dissolve() | |
 | Convert to InnoDB Cluster | mysqlsh > dba.create_cluster('clusterName', {"adoptFromGR":True})  | mysqlsh > group_replication.convertToIC('cluster_name') |
 | Convert from InnoDB Cluster to Group Replication |  | mysqlsh > group_replication.adoptFromIC() |
 | Set replication from InnoDB Cluster | | mysqlsh > group_replication.addChannel('channel_name','router_host',router_port) |
 | Start replication channel | | mysqlsh > group_replication.startChannel('channel_name') |
 | Stop replication channel | | mysqlsh > group_replication.stopChannel('channel_name') |
 | Show all replications status | | mysqlsh > group_replication.showChannel() | 
-| Create Replication User on InnoDB Cluster | | group_replication.innodb_cluster_create_repl_usr('username') |
-| Flip Cluster Roles for site switchover | | group_replication.flipClusterRoles(cluster_name) | 
+| Create Replication User on InnoDB Cluster | | mysqlsh > group_replication.innodb_cluster_create_repl_usr('username') |
+| Flip Cluster Roles for site switchover | | mysqlsh > group_replication.flipClusterRoles(cluster_name) | 
 
 ## Plugin Installation
 1. Copy init.py
