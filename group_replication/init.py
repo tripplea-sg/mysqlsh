@@ -101,13 +101,15 @@ def i_run_sql(query, strdel, getColumnNames):
 def i_sess_identity(conn):
     clusterAdminPassword = ""
     if conn == "current":
+        result = i_run_sql("show variables like 'report_host'","[']",False)
+        hostname = result[0].strip("report_host'").strip(", '")
         x = shell.parse_uri(shell.get_session().get_uri())
-        hostname = x['host']
     else:
         z = shell.get_session()
         y = shell.open_session(conn)
         shell.set_session(y)
-        hostname = shell.parse_uri(y.get_uri())['host']
+        result = i_run_sql("show variables like 'report_host'","[']",False)
+        hostname = result[0].strip("report_host'").strip(", '")
         shell.set_session(z)
         x = shell.parse_uri(conn)
         clusterAdminPassword = x['password']
@@ -175,10 +177,18 @@ def startChannel(channel_name, session=None):
         print('INFO: Replication channel is started')
         time.sleep(10)
         try:
+            remote_user = i_run_sql("select repl_user from mysql_gr_replication_metadata.channel","[']",False)        
+            h=shell.parse_uri(shell.get_session().get_uri())['host']
+            p=shell.parse_uri(shell.get_session().get_uri())['port']
+            local_repl=shell.open_session(remote_user[0] + '@' + h + ':' + str(p))
+            shell.set_session(local_repl)
+
             result = i_run_sql("create event if not exists mysql_gr_replication_metadata." + channel_name + " ON SCHEDULE every 2 second do start replica for channel '" + channel_name + "';", "", False)
             shell.get_session().run_sql("SET GLOBAL event_scheduler = OFF;")
             shell.get_session().run_sql("alter event mysql_gr_replication_metadata." + channel_name + " enable;")
             shell.get_session().run_sql("SET GLOBAL event_scheduler = ON;")
+
+            shell.set_session(session)
         except:
             print('WARNING: mysql_gr_replication_metadata does not exist - ignored !')
     except:
@@ -204,9 +214,15 @@ def stopChannel(channel_name, session=None):
 
     try:
         try:
+            remote_user = i_run_sql("select repl_user from mysql_gr_replication_metadata.channel","[']",False)
+            h=shell.parse_uri(shell.get_session().get_uri())['host']
+            p=shell.parse_uri(shell.get_session().get_uri())['port']
+            local_repl=shell.open_session(remote_user[0] + '@' + h + ':' + str(p))
+            shell.set_session(local_repl)
             shell.get_session().run_sql("alter event mysql_gr_replication_metadata." + channel_name + " disable;")
         except:
             print('WARNING: mysql_gr_replication_metadata schema does not exist - ignored!')
+        shell.set_session(session)
         shell.get_session().run_sql("stop replica for channel '" + channel_name + "'")
         print('INFO: replication is stopped')
     except:
@@ -215,8 +231,6 @@ def stopChannel(channel_name, session=None):
 def i_check_local_role():
     clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
     result = i_run_sql("select member_role from performance_schema.replication_group_members where channel_name='group_replication_applier' and concat(member_host,':',member_port)='" + hostname + ":" + port + "'","[']",False)
-    if len(result) == 0:
-        result = i_run_sql("select member_role from performance_schema.replication_group_members where channel_name='group_replication_applier' and concat(member_host,':',member_port)='127.0.0.1:" + port + "'","[']",False)
     return result[0]
 
 def i_start_gr(isPRIMARY):
@@ -308,13 +322,14 @@ def setPrimaryInstance(connectionStr):
     if i_check_local_role() != "PRIMARY":
         current_primary = i_run_sql("select concat(member_host,':',member_port) from performance_schema.replication_group_members where channel_name='group_replication_applier' and member_role='PRIMARY'","[']",False)
         cp_user=shell.prompt('Please provide user to connect to current PRIMARY node (' + current_primary[0] + '): ')
-        pp_user=shell.prompt('Please provide password to connect to current PRIMARY node (' + current_primary[0] + '): ', {"type":"password"})
+        # pp_user=shell.prompt('Please provide password to connect to current PRIMARY node (' + current_primary[0] + '): ', {"type":"password"})
         try:
-            c=shell.open_session(cp_user + ':' + pp_user + '@' + current_primary[0])
+            c=shell.open_session(cp_user + '@' + current_primary[0])
             shell.set_session(c)
         except:
             shell.set_session(x)
             print('ERROR: unable to connect to PRIMARY server !')
+            return
 
     new_primary = i_run_sql("SELECT member_id FROM performance_schema.replication_group_members where channel_name='group_replication_applier' and concat(member_host,':',member_port)='" + connectionStr + "'","[']",False)
 
@@ -325,11 +340,11 @@ def setPrimaryInstance(connectionStr):
     try:
         if len(i_list_all_channel()) != 0:
             c_user=shell.prompt('Please provide user to start replication channel on ' + connectionStr + ': ')
-            p_user=shell.prompt('Please provide password for ' + c_user + ': ', {"type":"password"})
+            # p_user=shell.prompt('Please provide password for ' + c_user + ': ', {"type":"password"})
             for channel_name in i_list_all_channel():
                 stopChannel(channel_name)
                 start_channel_name.append(channel_name)
-            y=shell.open_session(c_user + ":" + p_user + "@" + connectionStr)
+            y=shell.open_session(c_user + "@" + connectionStr)
             shell.set_session(y)
             result = i_run_sql("select group_replication_set_as_primary('" + new_primary[0] + "')","'",False)
             for channel_name in start_channel_name:
@@ -337,12 +352,16 @@ def setPrimaryInstance(connectionStr):
             shell.set_session(x)
         else:
             result = i_run_sql("select group_replication_set_as_primary('" + new_primary[0] + "')","'",False)
+    
     except:
         shell.set_session(x)
         if len(start_channel_name) != 0:
             for channel_name in start_channel_name:
                 startChannel(channel_name)
         print("ERROR: the server is not part of Group Replication or is not running or unable to connect to the current PRIMARY server, aborting !")
+    
+    shell.set_session(x)
+
     return status()
 
 def i_start_gr_all(connectionStr):
@@ -359,7 +378,7 @@ def i_create_or_add(ops, connectionStr, group_replication_group_name, group_repl
     global clusterAdminPassword
     clusterAdmin = shell.parse_uri(shell.get_session().get_uri())['user']
     if not clusterAdminPassword:
-       clusterAdminPassword = shell.prompt("Enter the password for {} : ".format(connectionStr),{'type': 'password'})
+       clusterAdminPassword = shell.prompt("Enter the password for {} : ".format(clusterAdmin),{'type': 'password'})
     if (ops == "ADD" or ops == "CLONE"):
         CA, CAP, local_hostname, local_port = i_sess_identity("current")
         x=shell.get_session()
@@ -471,11 +490,9 @@ def addInstance(connectionStr):
             i_install_plugin("clone", "mysql_clone.so")
 
         # checking if the new instance is running
-        if clusterAdminPassword == "":
-            clusterAdminPassword = shell.prompt('Please provide password for ' + i_get_host_port(connectionStr) + ': ',{"type":"password"})
         x=shell.get_session()
         try:
-            y=shell.open_session(clusterAdmin + ":" + clusterAdminPassword + "@" + i_get_host_port(connectionStr))
+            y=shell.open_session(clusterAdmin + "@" + i_get_host_port(connectionStr))
             shell.set_session(y)
             shell.set_session(x)
             i_set_all_grseed_replicas(old_gr_seed, new_gr_seed, clusterAdmin, clusterAdminPassword)
@@ -493,14 +510,24 @@ def convertToIC(clusterName):
     Args:
         clusterName (string): Any name for your InnoDB Cluster
     """
+    x=shell.get_session()
+    if i_check_local_role() != "PRIMARY":
+        current_primary = i_run_sql("select concat(member_host,':',member_port) from performance_schema.replication_group_members where channel_name='group_replication_applier' and member_role='PRIMARY'","[']",False)
+        cp_user=shell.prompt('Please provide user to connect to current PRIMARY node (' + current_primary[0] + '): ')
+        # pp_user=shell.prompt('Please provide password to connect to current PRIMARY node (' + current_primary[0] + '): ', {"type":"password"})
+        try:
+            c=shell.open_session(cp_user + '@' + current_primary[0])
+            shell.set_session(c)
+        except:
+            shell.set_session(x)
+            print('ERROR: unable to connect to PRIMARY server !')
+
     msg_output = "0"
-    if i_check_local_role() == "PRIMARY":
-        i_stop_other_replicas()
-        i_drop_ic_metadata()
-        dba.create_cluster(clusterName, {"adoptFromGR":True})
-        msg_output = "Successful conversion from Group Replication to InnoDB Cluster"
-    else:
-        msg_output = "FAILED - Instance is not PRIMARY"
+    i_stop_other_replicas()
+    i_drop_ic_metadata()
+    dba.create_cluster(clusterName, {"adoptFromGR":True})
+    msg_output = "Successful conversion from Group Replication to InnoDB Cluster"
+    shell.set_session(x)    
     return msg_output
 
 @plugin_function("group_replication.adoptFromIC")
@@ -509,21 +536,34 @@ def adoptFromIC():
     Convert From InnoDB Cluster to native Group Replication
     This function converts a MySQL InnoDB Cluster to a native Group Replication environment
     """
-    msg_output = "FAILED - Instance is not a PRIMARY"
-    if i_check_local_role() == "PRIMARY":
-       clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
-       # clusterAdminPassword = shell.prompt('Please provide password for Cluster Admin: ',{"type":"password"})
-       host_list = i_get_other_node()
-       dba.get_cluster().dissolve({"interactive":False})
-       create()
-       if len(host_list) != 0:
-           for secNode in host_list:
-               if shell.parse_uri(secNode)["port"] > 10000:
-                   addInstance(clusterAdmin + ":" + clusterAdminPassword + "@" + secNode[:-1])
-               else:
-                   addInstance(clusterAdmin + ":" + clusterAdminPassword + "@" + shell.parse_uri(secNode)["host"] + ":" + str(shell.parse_uri(secNode)["port"] - 10))
-       i_drop_ic_metadata()
-       msg_output = "Successful conversion from InnoDB Cluster to Group Replication"
+    x=shell.get_session()
+    if i_check_local_role() != "PRIMARY":
+        current_primary = i_run_sql("select concat(member_host,':',member_port) from performance_schema.replication_group_members where channel_name='group_replication_applier' and member_role='PRIMARY'","[']",False)
+        cp_user=shell.prompt('Please provide user to connect to current PRIMARY node (' + current_primary[0] + '): ')
+        # pp_user=shell.prompt('Please provide password to connect to current PRIMARY node (' + current_primary[0] + '): ', {"type":"password"})
+        try:
+            c=shell.open_session(cp_user + '@' + current_primary[0])
+            shell.set_session(c)
+        except:
+            shell.set_session(x)
+            print('ERROR: unable to connect to PRIMARY server !')
+
+    clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
+    # clusterAdminPassword = shell.prompt('Please provide password for Cluster Admin: ',{"type":"password"})
+    host_list = i_get_other_node()
+    dba.get_cluster().dissolve({"interactive":False})
+    create()
+    if len(host_list) != 0:
+        for secNode in host_list:
+            if shell.parse_uri(secNode)["port"] > 10000:
+                print('INFO: Adding instance ' + secNode[:-1])
+                addInstance(clusterAdmin + "@" + secNode[:-1])
+            else:
+                print('INFO: Adding instance ' + shell.parse_uri(secNode)["host"] + ":" + str(shell.parse_uri(secNode)["port"] - 10))
+                addInstance(clusterAdmin + "@" + shell.parse_uri(secNode)["host"] + ":" + str(shell.parse_uri(secNode)["port"] - 10))
+    i_drop_ic_metadata()
+    msg_output = "Successful conversion from InnoDB Cluster to Group Replication"
+    shell.set_session(x)
     return msg_output
 
 @plugin_function("group_replication.rebootGRFromCompleteOutage")
@@ -533,12 +573,12 @@ def rebootGRFromCompleteOutage():
    This function starts Group Replication
    """
    clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
-   clusterAdminPassword = shell.prompt('Please provide password for Cluster Admin : ',{"type":"password"})
+   # clusterAdminPassword = shell.prompt('Please provide password for Cluster Admin : ',{"type":"password"})
    x=shell.get_session()
    local_gtid = i_get_gtid("current")
    process_sts = "Y"
    for node in i_get_other_node():
-       remote_gtid = i_get_gtid(clusterAdmin + ":" + clusterAdminPassword + "@" + node)
+       remote_gtid = i_get_gtid(clusterAdmin + "@" + node)
        if i_comp_gtid(local_gtid, remote_gtid) != "1":
             process_sts = "N"
    if process_sts == "Y":
@@ -593,12 +633,12 @@ def addChannel(channel_name, router_host, router_port_number, session=None):
     router_port = str(router_port_number)
     clusterAdmin, clusterAdminPassword, hostname, port = i_sess_identity("current")
     remote_user = shell.prompt('Please provide user to connect to remote database : ')
-    remote_password = shell.prompt("Please provide password for '" + remote_user + "': '",{"type":"password"})
+    # remote_password = shell.prompt("Please provide password for '" + remote_user + "': '",{"type":"password"})
     
     # Create group replication's replication metadata schema on other cluster
     x=shell.get_session()
     try:
-        y=shell.open_session(remote_user + ":" + remote_password + "@" + router_host + ":" + router_port)
+        y=shell.open_session(remote_user + "@" + router_host + ":" + router_port)
         shell.set_session(y)
         result = i_run_sql('create database if not exists mysql_gr_replication_metadata',"[']",False)
         result = i_run_sql('create table if not exists mysql_gr_replication_metadata.channel (channel_name varchar(10) primary key, repl_user varchar(10))',"", False)
@@ -614,17 +654,16 @@ def addChannel(channel_name, router_host, router_port_number, session=None):
     shell.set_session(x)
     print('INFO: mysql_gr_replication_metadata schema is installed on remote database')
     print('INFO: configuring replication channel ...')
-    if clusterAdminPassword == "":
-        clusterAdminPassword = shell.prompt("Please provide password for local user '" + clusterAdmin + "' : ", {"type":"password"}) 
+    remote_user_password = shell.prompt("Please provide again the password for replication user '" + remote_user + "' : ", {"type":"password"}) 
    
     for node in i_get_other_node():
         print("Configuring replication channel on '" + shell.parse_uri(node)["host"] + ":" + str(shell.parse_uri(node)["port"] - 10))
-        y=shell.open_session(clusterAdmin + ":" + clusterAdminPassword + "@" + shell.parse_uri(node)["host"] + ":" + str(shell.parse_uri(node)["port"] - 10))
+        y=shell.open_session(clusterAdmin + "@" + shell.parse_uri(node)["host"] + ":" + str(shell.parse_uri(node)["port"] - 10))
         shell.set_session(y)
-        result = i_run_sql("change master to master_host='" + router_host + "', master_port=" + router_port + ", master_user='" + clusterAdmin + "', master_password='" + clusterAdminPassword + "', master_ssl=1, master_auto_position=1, get_master_public_key=1 for channel '" + channel_name + "'", "", False)
+        result = i_run_sql("change master to master_host='" + router_host + "', master_port=" + router_port + ", master_user='" + remote_user + "', master_password='" + remote_user_password + "', master_ssl=1, master_auto_position=1, get_master_public_key=1 for channel '" + channel_name + "'", "", False)
     shell.set_session(session)
     print("INFO: Configuring replication channel on " + hostname + ":" + port)
-    result = i_run_sql("change master to master_host='" + router_host + "', master_port=" + router_port + ", master_user='" + clusterAdmin + "', master_password='" + clusterAdminPassword + "', master_ssl=1, master_auto_position=1, get_master_public_key=1 for channel '" + channel_name + "'", "", False)
+    result = i_run_sql("change master to master_host='" + router_host + "', master_port=" + router_port + ", master_user='" + remote_user + "', master_password='" + remote_user_password + "', master_ssl=1, master_auto_position=1, get_master_public_key=1 for channel '" + channel_name + "'", "", False)
     print("INFO: Starting replication from " + router_host + ":" + router_port + " ...")
     result = i_run_sql("start replica for channel '" + channel_name + "'", "", False)
     
@@ -639,8 +678,13 @@ def addChannel(channel_name, router_host, router_port_number, session=None):
     print('INFO: mysql_gr_replication_metadata schema is replicated successfuly. An event will be created')
   
     try:
+        h=shell.parse_uri(shell.get_session().get_uri())['host']
+        p=shell.parse_uri(shell.get_session().get_uri())['port']
+        local_repl=shell.open_session(remote_user + '@' + h + ':' + str(p))
+        shell.set_session(local_repl)
         result = i_run_sql("create event if not exists mysql_gr_replication_metadata." + channel_name + " ON SCHEDULE every 2 second do start replica for channel '" + channel_name + "';", "", False)
         print('INFO: An event is created to monitor channel ' + channel_name)
+        shell.set_session(session)
     except:
         print('WARNING: mysql_gr_replication_metadata schema does not exist.')
     return print("All nodes have this replication channel")
@@ -650,6 +694,11 @@ def innodb_cluster_create_repl_usr(repl_user):
     try:
       dba.get_cluster()
       user_password = shell.prompt("Please provide password for '" + repl_user + "' : ", {"type":"password"})
+      confirm_password = shell.prompt("Please confirm password for '" + repl_user + "' ", {"type":"password"})
+      if user_password != confirm_password:
+          print("ERROR: Password mismatch !")
+          return
+
       result = i_run_sql("create user if not exists " + repl_user + " identified by '" + user_password + "'", "" , False)
       result = i_run_sql("grant replication slave on *.* to " + repl_user + "@'%';", "", False)
       result = i_run_sql("grant all privileges on *.* to " + repl_user + "@'%' with grant option;", "", False)
@@ -748,4 +797,4 @@ def flipClusterRoles(cluster_name):
     convertToIC(cluster_name)
 
     print("##################################### STEP 5 : Additional Manual Steps ########################################")
-    print("You must configure router for new InnoDB Cluster and set replication to router from Group Replication")
+    print("WARNING: You must configure router for new InnoDB Cluster and set replication to router from Group Replication")
