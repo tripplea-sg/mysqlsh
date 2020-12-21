@@ -99,12 +99,12 @@ router/start.sh
 ### E.2. Setup replication user on InnoDB Cluster
 Connect to 3306 instance on DC1 using root
 ```
-mysqlsh > group_replication.innodb_cluster_create_repl_usr('repl')
+mysqlsh > group_replication.setMultiClusterReplUser('repl')
 ```
 ### E.3. Setup replication 
 Connect to 3306 instance on DC2 using gradmin
 ```
-mysqlsh > group_replication.addChannel('chanenl1','{router_host}',{router_port})
+mysqlsh > group_replication.setMultiClusterChannel('chanenl1','{router_host}',{router_port})
 ```
 ### E.4. Show Replication Channel Status
 ```
@@ -112,11 +112,11 @@ mysqlsh > group_replication.showChannel()
 ```
 ### To Stop Replication Channel
 ```
-mysqlsh > group_replication.stopChannel('channel1')
+mysqlsh > group_replication.stopMultiClusterChannel('channel1')
 ```
 ### To Start Replication Channel
 ```
-mysqlsh > group_replication.startChannel('channel1')
+mysqlsh > group_replication.startMultiClusterChannel('channel1')
 ```
 Once replication is started, the Group Replication is surely having mysql_innodb_cluster_metadata schema because of the replication. </br>
 This is perfectly normal and it won't affect Group Replication because the Group Replication does not use mysql_innodb_cluster_metadata schema at all. </br>
