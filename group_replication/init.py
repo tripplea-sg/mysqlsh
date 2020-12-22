@@ -823,6 +823,69 @@ def rebootGRFromCompleteOutage():
        print("Node was not a PRIMARY, try another node")
    return status()
 
+@plugin_function("group_replication.setFailoverOnChannel")
+def setFailoverOnChannel(channel_name):
+    if i_check_local_role() != 'PRIMARY':
+        print('\n\033[1mERROR:\033[0m This function has to be executed from PRIMARY node \n')
+        return
+
+    try:
+        result = i_run_sql("select repl_user from mysql_gr_replication_metadata.channel;","[']",False)
+        repl_user=result[0]
+    except:
+        print("\n\033[1mERROR:\033[0m Multi Cluster replication user is not set \n")
+        return
+
+    try:
+        result = i_run_sql("select host from mysql.slave_master_info where channel_name='" + channel_name + "'", "[']", False)
+        router_host=result[0]
+    except:
+        print("\n\033[1mERROR:\033[0m could not get master info from mysql.slave_master_info\n")
+        return
+
+    try:
+        result = i_run_sql("select port from mysql.slave_master_info where channel_name='" + channel_name + "'", "[']", False)
+        router_port=result[0]
+    except:
+        print("\n\033[1mERROR:\033[0m could not get master info from mysql.slave_master_info \n")
+        return
+    print("\n\033[96mTest connection to " + repl_user + "@" + router_host + ":" + str(router_port) + "\033[0m\n")
+    repl_password = shell.prompt("Please confirm password for '" + repl_user + "' ", {"type":"password"})
+
+    try:
+        x=shell.get_session()
+        y=shell.open_session(repl_user + "@" + router_host + ":" + str(router_port), repl_password)
+        shell.set_session(y)
+        result = i_run_sql("select concat(member_host,':',member_port) from performance_schema.replication_group_members where channel_name='group_replication_applier'","[']",False)
+        # shell.set_session(x)
+        try:
+            r = i_run_sql("select concat(host,':',port)  from mysql.replication_asynchronous_connection_failover where channel_name='" + channel_name + "'", "[']",False)
+            if len(r) > 0:
+                for row in range(len(r)):
+                    _host = shell.parse_uri(r[row])["host"]
+                    _port = shell.parse_uri(r[row])["port"]
+                    
+                    s = i_run_sql("select asynchronous_connection_failover_delete_source('" + channel_name + "', '" + _host + "', " + str(_port) + ", '')","",False)
+
+            if len(result) > 0:
+                for row in range(len(result)):
+                    _host = shell.parse_uri(result[row])["host"]
+                    _port = shell.parse_uri(result[row])["port"]
+                    r = i_run_sql("select asynchronous_connection_failover_add_source('" + channel_name +"', '" + _host + "', " + str(_port) +", '', 50)","[']",False)
+                shell.set_session(x)
+                stopMultiClusterChannel(channel_name)
+                rs = i_run_sql("change master to master_host='" + router_host + "', master_port=" + str(router_port) + ", master_user='" + repl_user + "', master_password='" + repl_password + "', master_ssl=1, master_auto_position=1, source_connection_auto_failover=1, master_connect_retry=3, master_retry_count=3, get_master_public_key=1 for channel '" + channel_name + "'", "", False)
+                startMultiClusterChannel(channel_name)
+            return shell.get_session().run_sql("select * from mysql.replication_asynchronous_connection_failover")
+        except:
+            print("\033[1mERROR:\033[0m unable to setup async replication failover \n")
+            return   
+    except:
+        print("\033[1mERROR:\033[0m unable to establish connection to " + router_host + ":" + str(router_port) + "\n")
+        shell.set_session(x)
+        return
+
+
 @plugin_function("group_replication.editMultiClusterChannel")
 def editMultiClusterChannel(channel_name, endpoint_host, endpoint_port_number, session=None):
 
@@ -839,7 +902,6 @@ def editMultiClusterChannel(channel_name, endpoint_host, endpoint_port_number, s
     setMultiClusterChannel(channel_name, endpoint_host, endpoint_port_number)    
     startMultiClusterChannel(channel_name)
     return showChannel()
-
 
 @plugin_function("group_replication.setMultiClusterChannel")
 def setMultiClusterChannel(channel_name, router_host, router_port_number, session=None):
@@ -941,6 +1003,7 @@ def setMultiClusterReplUser(repl_user):
         print('\033[1mERROR:\033[0m Check if your connection ' +  str(shell.get_session()) + ' has sufficient privileges to configure this user')
         print('\n\033[96mINFO:\033[0m Try to run this function using root user \n')
      
+
 @plugin_function("group_replication.flipClusterRoles")
 def flipClusterRoles(cluster_name):
    
@@ -1038,6 +1101,7 @@ def flipClusterRoles(cluster_name):
 
     print("\n\n\033[92m********* STEP 5 : Additional Manual Steps *********\033[0m")
     print("\033[1mWARNING:\033[0m You must configure \033[96mrouter\033[0m for a multi cluster replication")
+    print("\033[1mWARNING:\033[0m If async. replication failover was implemented, please rerun setFailoverOnChannel on Group Replication\n")
 
 def i_checkInstanceConfiguration():
     print("\033[1mValidating MySQL instance for use in a Group Replication...\033[0m\n")
