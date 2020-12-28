@@ -20,7 +20,7 @@ This method is distributed in the hope that it will be useful,
 | SetOption | mysqlsh > cluster.setOptions(<option>) | |
 | Set Instance Option | mysqlsh > cluster.setInstanceOptions(<option>) | |
 | Remove Instance | mysqlsh > cluster.removeInstance('instance') | mysqlsh > group_replication.removeInstance('instance') |
-| Dissolve cluster | mysqlsh > cluster.dissolve() | |
+| Dissolve cluster | mysqlsh > cluster.dissolve() | mysqlsh > group_replication.dissolve() |
 | Convert to InnoDB Cluster | mysqlsh > dba.create_cluster('clusterName', {"adoptFromGR":True})  | mysqlsh > group_replication.convertToIC('cluster_name') |
 | Convert from InnoDB Cluster to Group Replication |  | mysqlsh > group_replication.adoptFromIC() |
 | Set replication from InnoDB Cluster | | mysqlsh > group_replication.setMultiClusterChannel('channel_name','router_host',router_port) |
