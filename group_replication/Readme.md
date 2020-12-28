@@ -29,7 +29,9 @@ This method is distributed in the hope that it will be useful,
 | Edit replication channel | | mysqlsh > group_replication.editMultiClusterChannel('channel_name') |
 | Show all replications status | | mysqlsh > group_replication.showChannel() | 
 | Create Replication User on InnoDB Cluster | | mysqlsh > group_replication.setMultiClusterReplUser('username') |
-| Flip Cluster Roles for site switchover | | mysqlsh > group_replication.flipClusterRoles(cluster_name) | 
+| Flip Cluster Roles for site switchover | | mysqlsh > group_replication.flipClusterRoles('cluster_name') | 
+| Implement async. auto failover | | mysqlsh > group_replication.setFailoverOnChannel('channel_name') |
+| Sync group replication group seeds | | mysqlsh > group_replication.syncLocalMembers() |
 
 ## Plugin Installation
 1. Copy init.py
