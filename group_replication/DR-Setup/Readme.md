@@ -104,7 +104,11 @@ mysqlsh > group_replication.setMultiClusterReplUser('repl')
 ### E.3. Setup replication 
 Connect to 3306 instance on DC2 using gradmin
 ```
-mysqlsh > group_replication.setMultiClusterChannel('chanenl1','{router_host}',{router_port})
+mysqlsh > group_replication.setMultiClusterChannel('channel1','{router_host}',{router_port})
+```
+OPTIONAL: if version >= 8.0.22 and you want to implement Async. Replication Failover:
+```
+mysqlsh > group_replication.setFailoverOnChannel('{channel_name}')
 ```
 ### E.4. Show Replication Channel Status
 ```
