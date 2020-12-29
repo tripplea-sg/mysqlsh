@@ -41,20 +41,24 @@ This method is distributed in the hope that it will be useful,
 | Remove auto Replication Async. Failover | | mysqlsh > group_replication.removeFailoverChannel('channel_name') |
 | Auto Clone from InnoDB Cluster | | mysqlsh > group_replication.autoCloneICtoGR() |
 
-## B. Plugin Installation
+## B. Use Case
+
+![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/Diagram.png)
+
+## C. Plugin Installation
 1. Create directory: mkdir -p $HOME/.mysqlsh/plugins/group_replication 
 2. Copy init.py
 3. Paste into $HOME/.mysqlsh/plugins/group_replication/init.py
 4. Copy gr.py
 5. Paste into $HOME/.mysqlsh/plugins/group_replication/gr.py
 
-## C.  Group Replication Deployment
-### C.1. Environment
+## D.  Group Replication Deployment
+### D.1. Environment
 Let say we have 3 instances: 
 1. Node1, port 3306
 2. Node2, port 3306
 3. Node3, port 3306
-### C.2. Configure Instance
+### D.2. Configure Instance
 Assume clusterAdmin = gradmin, clusterAdminPassword = grpass </br>
 Login to Node1:
 ```
@@ -68,7 +72,7 @@ Login to Node3:
 ```
 mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3306 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
 ```
-### C.3. Install a Group Replication
+### D.3. Install a Group Replication
 Login to Node1 and create Group Replication:
 ```
 $ mysqlsh gradmin:grpass@localhost:3306
@@ -88,8 +92,8 @@ View group replication status to ensure all nodes are ONLINE
 ```
 mysqlsh > group_replication.status()
 ```
-## D. Group Replication Management
-### D.1. Switching Primary Node
+## E. Group Replication Management
+### E.1. Switching Primary Node
 Let say we want to switch PRIMARY node to Node2
 ```
 mysqlsh > group_replication.setPrimaryInstance("gradmin:grpass@node2:3306")
@@ -98,7 +102,7 @@ Check the group replication status to ensure the result:
 ```
 mysqlsh > group_replication.status()
 ```
-### D.2. Reboot Group Replication From Complete Outage
+### E.2. Reboot Group Replication From Complete Outage
 Let say all nodes are down. Start all nodes, and run rebootGRFromCompleteOutage below from one of the nodes:
 ```
 mysqlsh gradmin:grpass@node2:3306
@@ -112,7 +116,7 @@ mysqlsh > group_replication.status()
 When any nodes is restarted, it will autojoin to Group Replication without manual intervention </br>
 This is because system variable group_replication_start_on_boot is set to ON.
 
-### D.3. Convert Group Replication into InnoDB Cluster
+### E.3. Convert Group Replication into InnoDB Cluster
 Let say we want to run as InnoDB Cluster instead of Group Replication, then login to PRIMARY node and run below:
 ```
 mysqlsh > group_replication.convertToIC('mycluster')
@@ -122,18 +126,18 @@ Check InnoDB Cluster status as follow:
 mysqlsh > var cluster = dba.getCluster()
 mysqlsh > cluster.status()
 ```
-### D.4. Convert InnoDB Cluster to Group Replication
+### E.4. Convert InnoDB Cluster to Group Replication
 Let say for some reasons we want to convert InnoDB Cluster to Group Replication (i.e. for DR purposes). </br>
 Login to PRIMARY node and run below:
 ```
 mysqlsh > group_replication.adoptFromIC()
 ```
-### D.5. Cloning Data from InnoDB Cluster into Group Replication
+### E.5. Cloning Data from InnoDB Cluster into Group Replication
 This is to clone InnoDB Cluster data to a Group Replication
 ```
 mysqlsh > group_replication.autoCloneICtoGR()
 ```
-### D.6. Setup Replication between InnoDB Cluster and Group Replication
+### E.6. Setup Replication between InnoDB Cluster and Group Replication
 Setup replication user on InnoDB Cluster
 ```
 $ mysqlsh root@site-A-1:3306
@@ -155,5 +159,5 @@ IF - and ONLY IF - you want to convert replication channel from "without Router"
 mysqlsh > group_replication.removeFailoverChannel('{channel_name}')
 mysqlsh > group_replication.editMultiClusterChannel('channel1','{router_host}',{router_port})
 ```
-## E. DR Sample and Functions 
+## F. DR Sample and Functions 
 See DR Folder
