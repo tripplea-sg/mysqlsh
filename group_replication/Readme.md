@@ -3,7 +3,7 @@
 MySQL Group Replication management and utilities. </br>
 A collection of functions to: </br>
 - handle MySQL Group Replication without using MySQL InnoDB Cluster (no metadata) 
-- Integration with InnoDB Cluster using async. replication 
+- Integration with MySQL InnoDB Cluster as Production and Group Replication as DR using async. replication 
 - Support flip cluster roles, auto clone from InnoDB Cluster, async. replication failover and many more
 
 This is a community-based custom MySQL Shell Plugin for Group Replication. </br>
