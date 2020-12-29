@@ -126,4 +126,5 @@ This is to clone InnoDB Cluster data to a Group Replication
 ```
 mysqlsh > group_replication.autoCloneICtoGR()
 ```
-
+## DR Sample and Functions 
+See DR Folder
