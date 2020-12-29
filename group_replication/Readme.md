@@ -73,6 +73,9 @@ Login to Node3:
 mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3306 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
 ```
 ### D.3. Install a Group Replication
+
+![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/Group-Replication-Deployment.png)
+
 Login to Node1 and create Group Replication:
 ```
 $ mysqlsh gradmin:grpass@localhost:3306
