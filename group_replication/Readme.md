@@ -121,5 +121,9 @@ Login to PRIMARY node and run below:
 ```
 mysqlsh > group_replication.adoptFromIC()
 ```
-
+## How to Refresh Data on Group Replication from InnoDB Cluster
+This is to clone InnoDB Cluster data to a Group Replication
+```
+mysqlsh > group_replication.autoCloneICtoGR()
+```
 
