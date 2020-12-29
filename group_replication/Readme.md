@@ -37,6 +37,8 @@ This method is distributed in the hope that it will be useful,
 | Flip Cluster Roles for site switchover | | mysqlsh > group_replication.flipClusterRoles('cluster_name') | 
 | Implement async. auto failover | | mysqlsh > group_replication.setFailoverOnChannel('channel_name') |
 | Sync group replication group seeds | | mysqlsh > group_replication.syncLocalMembers() |
+| Remove auto Replication Async. Failover | | mysqlsh > group_replication.removeFailoverChannel('channel_name') |
+| Auto Clone from InnoDB Cluster | | mysqlsh > group_replication.autoCloneICtoGR() |
 
 ## Plugin Installation
 1. Copy init.py
