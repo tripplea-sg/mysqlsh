@@ -150,7 +150,7 @@ mysqlsh > group_replication.setMultiClusterChannel('channel1','{router_host}',{r
 mysqlsh > group_replication.setMultiClusterChannel('channel1','{idc-primary-node}',{idc-primary-node_port})
 mysqlsh > group_replication.setFailoverOnChannel('{channel_name}')
 ```
-IF - and ONLY IF - you want to convert replication channel from "without Router" to using Router:
+IF - and ONLY IF - you want to convert replication channel from "without Router" to "using Router":
 ```
 mysqlsh > group_replication.removeFailoverChannel('{channel_name}')
 mysqlsh > group_replication.editMultiClusterChannel('channel1','{router_host}',{router_port})
