@@ -130,5 +130,18 @@ This is to clone InnoDB Cluster data to a Group Replication
 ```
 mysqlsh > group_replication.autoCloneICtoGR()
 ```
+### D.6. Setup Replication between InnoDB Cluster and Group Replication
+Setup replication user on InnoDB Cluster
+```
+$ mysqlsh root@site-A-1:3306
+mysqlsh > group_replication.setMultiClusterReplUser('{repl_username}')
+```
+Setup replication channel on Group Replication </br>
+Two option:
+- Using Router
+
+
+- Without Router (min. version: 8.0.22)
+
 ## E. DR Sample and Functions 
 See DR Folder
