@@ -42,8 +42,11 @@ This method is distributed in the hope that it will be useful,
 | Auto Clone from InnoDB Cluster | | mysqlsh > group_replication.autoCloneICtoGR() |
 
 ## B. Plugin Installation
-1. Copy init.py
-2. Paste into $HOME/.mysqlsh/plugins/group_replication/init.py
+1. Create directory: mkdir -p $HOME/.mysqlsh/plugins/group_replication 
+2. Copy init.py
+3. Paste into $HOME/.mysqlsh/plugins/group_replication/init.py
+4. Copy gr.py
+5. Paste into $HOME/.mysqlsh/plugins/group_replication/gr.py
 
 ## C.  Group Replication Deployment
 ### C.1. Environment
@@ -139,9 +142,18 @@ mysqlsh > group_replication.setMultiClusterReplUser('{repl_username}')
 Setup replication channel on Group Replication </br>
 Two option:
 - Using Router
-
-
+```
+mysqlsh > group_replication.setMultiClusterChannel('channel1','{router_host}',{router_port})
+```
 - Without Router (min. version: 8.0.22)
-
+```
+mysqlsh > group_replication.setMultiClusterChannel('channel1','{idc-primary-node}',{idc-primary-node_port})
+mysqlsh > group_replication.setFailoverOnChannel('{channel_name}')
+```
+IF - and ONLY IF - you want to convert replication channel from "without Router" to using Router:
+```
+mysqlsh > group_replication.removeFailoverChannel('{channel_name}')
+mysqlsh > group_replication.editMultiClusterChannel('channel1','{router_host}',{router_port})
+```
 ## E. DR Sample and Functions 
 See DR Folder
