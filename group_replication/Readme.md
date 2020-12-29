@@ -1,4 +1,9 @@
 # Integrating MySQL Shell with Group Replication
+
+MySQL Group Replication management and utilities. </br>
+A collection of functions to handle MySQL Group Replication </br>
+without using MySQL InnoDB Cluster (no metadata) </br> </br>
+
 This is a community-based custom MySQL Shell Plugin for Group Replication. </br>
 The codes and methods here are beta version, and we have not tested against production environment. </br>
 Appreciate your kind feedback.
