@@ -23,8 +23,16 @@ from mysqlsh.plugin_manager import plugin, plugin_function
 class group_replication:
     """
     MySQL Group Replication management and utilities.
-    A collection of functions to handle MySQL Group Replication
-    without using MySQL InnoDB Cluster (no metadata)
+    A collection of functions to:
+
+        1. handle MySQL Group Replication 
+           without using MySQL InnoDB Cluster (no metadata)
+
+        2. Integration with MySQL InnoDB Cluster as Production 
+           and Group Replication as DR using async. replication
+
+        3. Support flip cluster roles, auto clone from InnoDB Cluster, 
+           async. replication failover and many more
     """
 
 from group_replication import gr
