@@ -90,6 +90,10 @@ mysqlsh > group_replication.addInstance("gradmin:grpass@localhost:3308")
 ```
 mysqlsh > group_replication.status()
 ```
+### D.7. Refresh Group Replication Data on DR with InnoDB Cluster on PROD
+```
+mysqlsh > group_replication.autoCloneICtoGR()
+```
 ## E. Setup Replication between InnoDB Cluster to Group Replication
 ### E.1. Setup Router pointing to InnoDB Cluster
 ```
@@ -109,6 +113,10 @@ mysqlsh > group_replication.setMultiClusterChannel('channel1','{router_host}',{r
 OPTIONAL: if version >= 8.0.22 and you want to implement Async. Replication Failover:
 ```
 mysqlsh > group_replication.setFailoverOnChannel('{channel_name}')
+```
+To remove Async. Replication Failover:
+```
+group_replication.removeFailoverChannel('{channel_name}')
 ```
 ### E.4. Show Replication Channel Status
 ```
