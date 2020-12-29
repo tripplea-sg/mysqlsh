@@ -13,7 +13,7 @@ This method is distributed in the hope that it will be useful,
 </br> but WITHOUT ANY WARRANTY; without even the implied warranty of
 </br> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
-## A. Features
+## A. List of Features
 
 | Purpose | InnoDB Cluster Command | Group Replication Command |
 | ------|-------------|---------------- |
