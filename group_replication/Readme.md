@@ -7,8 +7,6 @@ A collection of functions to: </br>
 - Support flip cluster roles, auto clone from InnoDB Cluster, async. replication failover and many more
 
 This is a community-based custom MySQL Shell Plugin for Group Replication. </br>
-The codes and methods here are beta version, and we have not tested against production environment. </br>
-</br>
 This method is distributed in the hope that it will be useful,
 </br> but WITHOUT ANY WARRANTY; without even the implied warranty of
 </br> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
