@@ -117,23 +117,37 @@ To clone data from InnoDB Cluster to a Group Replication and make the Group Repl
 ```
 mysqlsh > group_replication.autoCloneICtoGR()
 ```
-This function is effective to build a new Group Replication from existing MySQL InnoDB Cluster.
-### E.6. Setup Replication between InnoDB Cluster and Group Replication
-Setup replication user on InnoDB Cluster
+This function is effective to build a new Group Replication with data coming from existing MySQL InnoDB Cluster.
+### E.6. Asynchronous Replication between MySQL InnoDB Cluster as Source and MySQL Group Replication as Replica
+#### E.6.1. On MySQL InnoDB Cluster as Source
+As MySQL root user, setup replication user on the PRIMARY node of MySQL InnoDB Cluster by running the following function:
 ```
-$ mysqlsh root@site-A-1:3306
-mysqlsh > group_replication.setMultiClusterReplUser('{repl_username}')
+$ mysqlsh root@ic-1:3306
+mysqlsh > group_replication.setMultiClusterReplUser('repl')
 ```
-Setup replication channel on Group Replication </br>
-Two option:
-- Using Router
+This command will create user 'repl' and assign all necessary privileges to support deployment and maintenance </br>
+of replication between InnoDB Cluster and Group Replication </br>
+#### E.6.2. On Group Replication as Replica
+Two options available:
+- Using Router as a gateway between InnoDB Cluster and Group Replication
 ```
-mysqlsh > group_replication.setMultiClusterChannel('channel1','{router_host}',{router_port})
+## assume channel1 is the replication channel name
+## assume router_host is the VM hostname where MySQL Router is running
+## assume 6446 is the R/W port on MySQL Router
+
+mysqlsh > group_replication.setMultiClusterChannel('channel1','router_host',6446)
 ```
 - Without Router (min. version: 8.0.22)
 ```
-mysqlsh > group_replication.setMultiClusterChannel('channel1','{idc-primary-node}',{idc-primary-node_port})
-mysqlsh > group_replication.setFailoverOnChannel('{channel_name}')
+## assune channel1 is the replication channel name
+## assune ic-1 is the PRIMARY node of the MySQL InnoDB Cluster
+## assume 3306 is the MySQL port
+
+mysqlsh > group_replication.setMultiClusterChannel('channel1','ic-1',3306)
+
+## activate the replication channel failover feature
+
+mysqlsh > group_replication.setFailoverOnChannel('channel1')
 ```
 IF - and ONLY IF - you want to convert replication channel from "without Router" to "using Router":
 ```
