@@ -6,7 +6,7 @@ A collection of functions to: </br>
 - Integrate with MySQL InnoDB Cluster as Production and Group Replication as DR using async. replication 
 - Support flip cluster roles, auto clone from InnoDB Cluster, async. replication failover and many more
 
-This is a community-based custom MySQL Shell Plugin for Group Replication. </br>
+This is a non-commercial and non-official custom MySQL Shell Plugin. </br>
 This method is distributed in the hope that it will be useful,
 </br> but WITHOUT ANY WARRANTY; without even the implied warranty of
 </br> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
