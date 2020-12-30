@@ -167,12 +167,12 @@ Since this plugin does not use metadata as in InnoDB Cluster, it relies on 2 com
 - performance_schema.replication_group_members
 - group_replication_group_seeds
 ```
+To check performance_schema.replication_group_members and group_replication_group seeds variable:
+
+mysqlsh > group_replication.status()
+
 ```
 Sometimes during operation, group_replication_group_seeds can possibly be out of sync with group_replication_group_members table. </br>
-How to check on each nodes:
-```
-mysqlsh > group_replication.status()
-```
 If group_replication_group_seeds is out of sync with group_replication_group_members table, then simply run the following on the affected nodes:
 ```
 mysqlsh > group_replication.syncLocalMembers()
