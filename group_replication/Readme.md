@@ -6,8 +6,7 @@ A collection of functions to: </br>
 - Orchestrate the switch over process to flip MySQL InnoDB Cluster into MySQL Group Replication and vice versa 
 
 This is a non-commercial and non-official custom MySQL Shell Plugin. </br></br>
-This method is distributed as Open Source in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-</br> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+This method is distributed as Open Source in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
 ## A. List of Functions
 
