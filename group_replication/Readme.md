@@ -101,23 +101,23 @@ Let say all databases are OFFLINE, run the following command to ONLINE all datab
 ```
 mysqlsh > group_replication.rebootGRFromCompleteOutage()
 ```
-### E.3. Switch MySQL Group Replication into MySQL InnoDB Cluster
+### E.3. Making MySQL Group Replication Runs as a MySQL InnoDB Cluster
 To convert a Group Replication into MySQL InnoDB Cluster, login to PRIMARY node and run below function. </br>
 Assume cluster_name is 'mycluster'
 ```
 mysqlsh > group_replication.convertToIC('mycluster')
 ```
-### E.4. Convert InnoDB Cluster to Group Replication
-Let say for some reasons we want to convert InnoDB Cluster to Group Replication (i.e. for DR purposes). </br>
-Login to PRIMARY node and run below:
+### E.4. Making MySQL InnoDB Cluster Runs as a "Vanilla" Group Replication
+To convert an InnoDB Cluster into MySQL Group Replication and remove mysql_innodb_cluster_metadata, login to PRIMARY node and run below function:
 ```
 mysqlsh > group_replication.adoptFromIC()
 ```
-### E.5. Cloning Data from InnoDB Cluster into Group Replication
-This is to clone InnoDB Cluster data to a Group Replication
+### E.5. Clone or Transfer Data from a MySQL InnoDB Cluster to a Group Replication
+To clone data from InnoDB Cluster to a Group Replication and make the Group Replication runs still as a Group Replication, use the following function:
 ```
 mysqlsh > group_replication.autoCloneICtoGR()
 ```
+This function is effective to build a new Group Replication from existing MySQL InnoDB Cluster.
 ### E.6. Setup Replication between InnoDB Cluster and Group Replication
 Setup replication user on InnoDB Cluster
 ```
