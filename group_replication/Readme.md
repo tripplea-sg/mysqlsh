@@ -3,7 +3,7 @@
 A collection of functions to: </br>
 - Deploy and manage MySQL Group Replication without using MySQL InnoDB Cluster (no metadata) 
 - Deploy and manage Asynchronous Replication between MySQL InnoDB Cluster and MySQL Group Replication
-- Orchestrate the switch over process to flip InnoDB Cluster into Group Replication and vice versa 
+- Orchestrate the switch over process to flip MySQL InnoDB Cluster into MySQL Group Replication and vice versa 
 
 This is a non-commercial and non-official custom MySQL Shell Plugin. </br>
 This method is distributed in the hope that it will be useful,
