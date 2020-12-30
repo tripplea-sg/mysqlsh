@@ -162,8 +162,9 @@ IF - and ONLY IF - you want to convert replication channel from "without Router"
 mysqlsh > group_replication.removeFailoverChannel('{channel_name}')
 mysqlsh > group_replication.editMultiClusterChannel('channel1','{router_host}',{router_port})
 ```
-## F. DR Sample and Functions 
+## F. Functions for DR Used Case
 Deploy a Group Replication as describe on section D2 and D3. </br></br>
+### F.1.
 Login to Group Replication's PRIMARY node, and clone database from InnoDB Cluster to Group Replication:
 ```
 mysqlsh > group_replication.autoCloneICtoGR()
