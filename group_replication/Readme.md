@@ -46,58 +46,54 @@ This method is distributed in the hope that it will be useful, but WITHOUT ANY W
 2. Download init.py from this site and place it into $HOME/.mysqlsh/plugins/group_replication/init.py
 3. Download gr.py from this site and place it into $HOME/.mysqlsh/plugins/group_replication/gr.py
 
-## D.  Group Replication Deployment
+## D. MySQL Group Replication Deployment
 ### D.1. Environment
-Let say we have 3 instances: 
-1. Node1, port 3306
-2. Node2, port 3306
-3. Node3, port 3306
+Let say we have 3 instances, which are:
+1. gr-1, port 3306
+2. gr-2, port 3306
+3. gr-3, port 3306
 ### D.2. Configure Instance
-Assume clusterAdmin = gradmin, clusterAdminPassword = grpass </br>
-Login to Node1:
+Assume our clusterAdmin user is "gradmin", and clusterAdminPassword is "grpass" </br>
+Login to gr-1 and run configureInstance() as in MySQL InnoDB Cluster
 ```
 mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3306 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
 ```
-Login to Node2:
+Login to gr-2 and run configureInstance() as in MySQL InnoDB Cluster
 ```
 mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3306 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
 ```
-Login to Node3:
+Login to gr-3 and run configureInstance() as in MySQL InnoDB Cluster
 ```
 mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3306 --user=root } --clusterAdmin=gradmin --clusterAdminPassword=grpass --interactive=false --restart=true
 ```
-### D.3. Install a Group Replication
+### D.3. Install MySQL Group Replication
 
 ![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/picture/Group-Replication-Deployment.png)
 
-Login to Node1 and create Group Replication:
+Login to gr-1 and create Group Replication with the following command:
 ```
-$ mysqlsh gradmin:grpass@localhost:3306
+$ mysqlsh gradmin:grpass@gr-1:3306
 mysqlsh > group_replication.create()
 ```
-Still on MySQL Shell, add Node2:
+Still on the same terminal, add gr-2 into MySQL Group Replication:
 ```
-mysqlsh > group_replication.addInstance("gradmin:grpass@node2:3306")
+mysqlsh > group_replication.addInstance("gradmin:grpass@gr-2:3306")
 Please select a recovery method [C]lone/[I]ncremental recovery/[A]bort (default Clone): 
 ```
-Still on MySQL Shell, add Node3:
+Still on the same terminal, add gr-3 into MySQL Group Replication:
 ```
-mysqlsh > group_replication.addInstance("gradmin:grpass@node3:3306")
+mysqlsh > group_replication.addInstance("gradmin:grpass@gr-3:3306")
 Please select a recovery method [C]lone/[I]ncremental recovery/[A]bort (default Clone): 
 ```
-View group replication status to ensure all nodes are ONLINE
+View status to ensure databases within the Group Replication are ONLINE
 ```
 mysqlsh > group_replication.status()
 ```
-## E. Group Replication Management
-### E.1. Switching Primary Node
-Let say we want to switch PRIMARY node to Node2
+## E. MySQL Group Replication Management
+### E.1. PRIMARY Node Switch
+Let say we want to switch PRIMARY node from gr-1 to gr-2:
 ```
-mysqlsh > group_replication.setPrimaryInstance("gradmin:grpass@node2:3306")
-```
-Check the group replication status to ensure the result:
-```
-mysqlsh > group_replication.status()
+mysqlsh > group_replication.setPrimaryInstance("gr-2:3306")
 ```
 ### E.2. Reboot Group Replication From Complete Outage
 Let say all nodes are down. Start all nodes, and run rebootGRFromCompleteOutage below from one of the nodes:
