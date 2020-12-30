@@ -151,20 +151,22 @@ mysqlsh > group_replication.setFailoverOnChannel('channel1')
 ```
 IF - and ONLY IF - you want to convert replication channel from "without Router" to "using Router":
 ```
-mysqlsh > group_replication.removeFailoverChannel('{channel_name}')
-mysqlsh > group_replication.editMultiClusterChannel('channel1','{router_host}',{router_port})
+mysqlsh > group_replication.removeFailoverChannel('channel1')
+mysqlsh > group_replication.editMultiClusterChannel('channel1','router_host',6446)
 ```
-### E.7. Synchronize Group Replication members with Group Replication Group Seeds
-Since this plugin does not use metadata as in InnoDB Cluster, it relies on 2 components to maintain group membership:
+### E.7. Handling Mismatch between 'replication_group_members' and 'group_replication_group_seeds'
+Since this plugin does not use metadata to maintain Group Replication as in MySQL InnoDB Cluster, </br>
+it relies on 2 MySQL components to maintain the group membership:
 - performance_schema.replication_group_members
 - group_replication_group_seeds
 ```
-To check performance_schema.replication_group_members and group_replication_group seeds variable:
+## Command to check and compare replication_group_members and group_replication_group seeds variable:
 
 mysqlsh > group_replication.status()
 
 ```
-Sometimes during operation, group_replication_group_seeds can possibly be out of sync with group_replication_group_members table. </br>
+It is strongly adviseable to keep replication_group_members and group_replication_group_seeds in sync to avoid operational issues. </br>
+However, it is not possible that due to some operation group_replication_group_seeds can possibly be out of sync with group_replication_group_members table. </br>
 If group_replication_group_seeds is out of sync with group_replication_group_members table, then simply run the following on the affected nodes:
 ```
 mysqlsh > group_replication.syncLocalMembers()
