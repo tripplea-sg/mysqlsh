@@ -139,8 +139,8 @@ mysqlsh > group_replication.setMultiClusterChannel('channel1','router_host',6446
 ```
 - Without Router (min. version: 8.0.22)
 ```
-## assune channel1 is the replication channel name
-## assune ic-1 is the PRIMARY node of the MySQL InnoDB Cluster
+## assume channel1 is the replication channel name
+## assume ic-1 is the PRIMARY node of the MySQL InnoDB Cluster
 ## assume 3306 is the MySQL port
 
 mysqlsh > group_replication.setMultiClusterChannel('channel1','ic-1',3306)
