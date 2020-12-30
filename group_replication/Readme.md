@@ -163,10 +163,10 @@ mysqlsh > group_replication.removeFailoverChannel('{channel_name}')
 mysqlsh > group_replication.editMultiClusterChannel('channel1','{router_host}',{router_port})
 ```
 ### E.7. Synchronize Group Replication members with Group Replication Group Seeds
-Since this plugin does not use metadata as in InnoDB Cluster, it maintains group membership using 2 components:
+Since this plugin does not use metadata as in InnoDB Cluster, it relies on 2 components to maintain group membership:
 - performance_schema.replication_group_members
 - group_replication_group_seeds
-Sometimes during operation, group_replication_group_seeds can possible be out of sync with group_replication_group_members table. </br>
+</br>Sometimes during operation, group_replication_group_seeds can possibly be out of sync with group_replication_group_members table. </br>
 How to check on each nodes:
 ```
 mysqlsh > group_replication.status()
