@@ -43,7 +43,7 @@ This method is distributed in the hope that it will be useful,
 
 ## B. Use Case
 
-![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/Diagram.png)
+![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/picture/Diagram.png)
 
 ## C. Plugin Installation
 1. Create directory: mkdir -p $HOME/.mysqlsh/plugins/group_replication 
@@ -74,7 +74,7 @@ mysqlsh -- dba configure-instance { --host=127.0.0.1 --port=3306 --user=root } -
 ```
 ### D.3. Install a Group Replication
 
-![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/Group-Replication-Deployment.png)
+![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/picture/Group-Replication-Deployment.png)
 
 Login to Node1 and create Group Replication:
 ```
