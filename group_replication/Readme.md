@@ -89,35 +89,23 @@ View status to ensure databases within the Group Replication are ONLINE
 ```
 mysqlsh > group_replication.status()
 ```
+This PLUGIN automatically set system variable group_replication_start_on_boot to ON.
 ## E. MySQL Group Replication Management
 ### E.1. PRIMARY Node Switch
 Let say we want to switch PRIMARY node from gr-1 to gr-2:
 ```
 mysqlsh > group_replication.setPrimaryInstance("gr-2:3306")
 ```
-### E.2. Reboot Group Replication From Complete Outage
-Let say all nodes are down. Start all nodes, and run rebootGRFromCompleteOutage below from one of the nodes:
+### E.2. Starting Up the Group Replication
+Let say all databases are OFFLINE, run the following command to ONLINE all databases:
 ```
-mysqlsh gradmin:grpass@node2:3306
 mysqlsh > group_replication.rebootGRFromCompleteOutage()
 ```
-Key-in the cluster Admin Password. </br>
-Check group replication status
-```
-mysqlsh > group_replication.status()
-```
-When any nodes is restarted, it will autojoin to Group Replication without manual intervention </br>
-This is because system variable group_replication_start_on_boot is set to ON.
-
-### E.3. Convert Group Replication into InnoDB Cluster
-Let say we want to run as InnoDB Cluster instead of Group Replication, then login to PRIMARY node and run below:
+### E.3. Switch MySQL Group Replication into MySQL InnoDB Cluster
+To convert a Group Replication into MySQL InnoDB Cluster, login to PRIMARY node and run below function. </br>
+Assume cluster_name is 'mycluster'
 ```
 mysqlsh > group_replication.convertToIC('mycluster')
-```
-Check InnoDB Cluster status as follow:
-```
-mysqlsh > var cluster = dba.getCluster()
-mysqlsh > cluster.status()
 ```
 ### E.4. Convert InnoDB Cluster to Group Replication
 Let say for some reasons we want to convert InnoDB Cluster to Group Replication (i.e. for DR purposes). </br>
