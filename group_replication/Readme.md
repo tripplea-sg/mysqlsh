@@ -166,7 +166,9 @@ mysqlsh > group_replication.editMultiClusterChannel('channel1','{router_host}',{
 Since this plugin does not use metadata as in InnoDB Cluster, it relies on 2 components to maintain group membership:
 - performance_schema.replication_group_members
 - group_replication_group_seeds
-</br>Sometimes during operation, group_replication_group_seeds can possibly be out of sync with group_replication_group_members table. </br>
+```
+```
+Sometimes during operation, group_replication_group_seeds can possibly be out of sync with group_replication_group_members table. </br>
 How to check on each nodes:
 ```
 mysqlsh > group_replication.status()
