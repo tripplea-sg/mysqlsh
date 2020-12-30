@@ -117,7 +117,7 @@ To clone data from InnoDB Cluster to a Group Replication and make the Group Repl
 ```
 mysqlsh > group_replication.autoCloneICtoGR()
 ```
-This function is effective to build a new Group Replication with data coming from existing MySQL InnoDB Cluster.
+This function is effective to build a new Group Replication with a BASELINE data coming from existing MySQL InnoDB Cluster.
 ### E.6. Asynchronous Replication between MySQL InnoDB Cluster as Source and MySQL Group Replication as Replica
 #### E.6.1. On MySQL InnoDB Cluster as Source
 As MySQL root user, setup replication user on the PRIMARY node of MySQL InnoDB Cluster by running the following function:
@@ -174,11 +174,11 @@ mysqlsh > group_replication.syncLocalMembers()
 ## F. Functions for DR Used Case
 ### F.1. Install a New Group Replication
 Follow section D2 and D3. 
-### F.2. Cloning data from InnoDB Cluster for BASELINE 
+### F.2. Cloning BASELINE data from existing PROD InnoDB Cluster to this new Group Replication
 ![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/picture/Clone.png)
 Login to Group Replication's PRIMARY node, and clone database from InnoDB Cluster to Group Replication:
 ```
 mysqlsh > group_replication.autoCloneICtoGR()
 ```
-Data in InnoDB Cluster will be copied into Group Replication.
+Data from InnoDB Cluster will be copied into Group Replication, and this process is COMPLETELY ONLINE.
 
