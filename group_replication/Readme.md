@@ -163,12 +163,13 @@ mysqlsh > group_replication.removeFailoverChannel('{channel_name}')
 mysqlsh > group_replication.editMultiClusterChannel('channel1','{router_host}',{router_port})
 ```
 ## F. Functions for DR Used Case
-Deploy a Group Replication as describe on section D2 and D3. 
-### F.1. Cloning data from InnoDB Cluster for BASELINE 
+### F.1. Install a New Group Replication
+Follow section D2 and D3. 
+### F.2. Cloning data from InnoDB Cluster for BASELINE 
 ![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/picture/Clone.png)
 Login to Group Replication's PRIMARY node, and clone database from InnoDB Cluster to Group Replication:
 ```
 mysqlsh > group_replication.autoCloneICtoGR()
 ```
-Data in InnoDB Cluster will be copied to Group Replication.
+Data in InnoDB Cluster will be copied into Group Replication.
 
