@@ -37,16 +37,14 @@ This method is distributed in the hope that it will be useful, but WITHOUT ANY W
 | Remove auto Replication Async. Failover | | mysqlsh > group_replication.removeFailoverChannel('channel_name') |
 | Auto Clone from InnoDB Cluster | | mysqlsh > group_replication.autoCloneICtoGR() |
 
-## B. Use Case
+## B. Use Case Diagram
 
 ![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/picture/Diagram.png)
 
 ## C. Plugin Installation
-1. Create directory: mkdir -p $HOME/.mysqlsh/plugins/group_replication 
-2. Copy init.py
-3. Paste into $HOME/.mysqlsh/plugins/group_replication/init.py
-4. Copy gr.py
-5. Paste into $HOME/.mysqlsh/plugins/group_replication/gr.py
+1. Create directory for the plugin on local terminal: mkdir -p $HOME/.mysqlsh/plugins/group_replication 
+2. Download init.py from this site and place it into $HOME/.mysqlsh/plugins/group_replication/init.py
+3. Download gr.py from this site and place it into $HOME/.mysqlsh/plugins/group_replication/gr.py
 
 ## D.  Group Replication Deployment
 ### D.1. Environment
