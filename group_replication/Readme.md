@@ -5,9 +5,8 @@ A collection of functions to: </br>
 - Deploy and manage Asynchronous Replication between MySQL InnoDB Cluster and MySQL Group Replication
 - Orchestrate the switch over process to flip MySQL InnoDB Cluster into MySQL Group Replication and vice versa 
 
-This is a non-commercial and non-official custom MySQL Shell Plugin. </br>
-This method is distributed in the hope that it will be useful,
-</br> but WITHOUT ANY WARRANTY; without even the implied warranty of
+This is a non-commercial and non-official custom MySQL Shell Plugin. </br></br>
+This method is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 </br> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
 ## A. List of Functions
