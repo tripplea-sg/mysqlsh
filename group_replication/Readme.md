@@ -163,4 +163,10 @@ mysqlsh > group_replication.removeFailoverChannel('{channel_name}')
 mysqlsh > group_replication.editMultiClusterChannel('channel1','{router_host}',{router_port})
 ```
 ## F. DR Sample and Functions 
-See DR Folder
+Deploy a Group Replication as describe on section D2 and D3. </br></br>
+Login to Group Replication's PRIMARY node, and clone database from InnoDB Cluster to Group Replication:
+```
+mysqlsh > group_replication.autoCloneICtoGR()
+```
+
+
