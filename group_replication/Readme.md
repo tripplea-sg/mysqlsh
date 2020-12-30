@@ -1,6 +1,5 @@
-# Integrating MySQL Shell with Group Replication
+# MySQL Group Replication management and utilities
 
-MySQL Group Replication management and utilities. </br>
 A collection of functions to: </br>
 - Deploy and manager MySQL Group Replication without using MySQL InnoDB Cluster (no metadata) 
 - Integrate with MySQL InnoDB Cluster as Production and Group Replication as DR using async. replication 
