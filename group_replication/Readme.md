@@ -196,7 +196,44 @@ mysqlsh > group_replication.startMultiClusterChannel('mychannel')
 This section explains how to perform site switchover, whereby Production site becomes DR and DR site becomes Production:
 - MySQL InnoDB Cluster on Production site is to be converted into MySQL Group Replication
 - MySQL Group Replication on DR site is to be converted into MySQL InnoDB Cluster
+- Setup replication from MySQL InnoDB Cluster on DR site to MySQL Group Replication on Production site
 Login into PRIMARY node of MySQL Group Replication as Cluster Admin user, and run the following command:
+```
+mysqlsh > group_replication.flipClusterRoles('mycluster')
+```
+### F.3. Real Disaster Recovery
+#### F.3.1. DR site activation
+During production site downtime, DR site has to be activated:
+- convert MySQL Group Replication on DR site into MySQL InnoDB Cluster
+```
+mysqlsh > group_replication.convertToIC('mycluster')
+```
+- Setup Router to connect to this InnoDB Cluster for application to connect and use
+#### F.3.2. Production site is back
+If production site is back and available, then perform the following:
+- setup a new Group Replication on Production site with no application data
+```
+mysqlsh > group_replication.create()
+mysqlsh > group_replication.addInstance('gradmin@ic-2:3306')
+mysqlsh > group_replication.addInstance('gradmin@ic-3:3306')
+```
+- Clone data from InnoDB Cluster on DR site into this Group Replication on Production site
+```
+mysqlsh > group_replication.autoCloneICtoGR()
+```
+- Setup and activate replication from DR site to Production site
+```
+## On production site:
+
+mysqlsh > group_replication.setMultiClusterChannel('channel1','gr-1',3306)
+mysqlsh > group_replication.setFailoverOnChannel('channel1')
+```
+#### F.3.3. Switch Back Operation to use Production Site
+Plan a time to switch back, and perform the following:
+- convert MySQL InnoDB Cluster on DR site into MySQL Group Replication
+- convert MySQL Group Replication on Production site into MySQL InnoDB Cluster
+- Setup replication from MySQL InnoDB Cluster on Production site to MySQL Group Replication on DR site
+Use the follong 1 command:
 ```
 mysqlsh > group_replication.flipClusterRoles('mycluster')
 ```
