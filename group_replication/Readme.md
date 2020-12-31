@@ -177,7 +177,7 @@ This section offers solution for DR environment using Group Replication while Pr
 Follow section D2 and D3. 
 #### F.1.2. Cloning BASELINE data from existing PROD InnoDB Cluster to this new Group Replication
 ![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/picture/Clone.png)
-Login to Group Replication's PRIMARY node, and clone database from InnoDB Cluster to Group Replication:
+Login to Group Replication's PRIMARY node as Cluster Admin user, and clone database from InnoDB Cluster to Group Replication:
 ```
 mysqlsh > group_replication.autoCloneICtoGR()
 ```
@@ -190,7 +190,11 @@ Follow section E.6.
 ```
 mysqlsh > group_replication.startMultiClusterChannel('mychannel')
 ```
-### F.2. Site Switch Over
+### F.2. DR Site Switch Over
 This section explains how to perform site switchover, whereby Production site becomes DR and DR site becomes Production:
 - MySQL InnoDB Cluster on Production site is to be converted into MySQL Group Replication
 - MySQL Group Replication on DR site is to be converted into MySQL InnoDB Cluster
+Login into PRIMARY node of MySQL Group Replication as Cluster Admin user, and run the following command:
+```
+mysqlsh > group_replication.flipClusterRoles('mycluster')
+```
