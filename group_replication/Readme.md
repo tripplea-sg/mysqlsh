@@ -171,9 +171,11 @@ If group_replication_group_seeds is out of sync with group_replication_group_mem
 mysqlsh > group_replication.syncLocalMembers()
 ```
 ## F. Functions for DR Used Case
-### F.1. Install a New Group Replication
+### F.1. Group Replication as DR Environment
+This section offers solution for DR environment using Group Replication while Production uses MySQL InnoDB Cluster
+#### F.1.1. Install a New Group Replication
 Follow section D2 and D3. 
-### F.2. Cloning BASELINE data from existing PROD InnoDB Cluster to this new Group Replication
+#### F.1.2. Cloning BASELINE data from existing PROD InnoDB Cluster to this new Group Replication
 ![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/picture/Clone.png)
 Login to Group Replication's PRIMARY node, and clone database from InnoDB Cluster to Group Replication:
 ```
