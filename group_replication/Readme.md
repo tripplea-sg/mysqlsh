@@ -153,6 +153,8 @@ IF - and ONLY IF - you want to convert replication channel from "without Router"
 mysqlsh > group_replication.removeFailoverChannel('channel1')
 mysqlsh > group_replication.editMultiClusterChannel('channel1','router_host',6446)
 ```
+After this setup, a new schema will be added to both MySQL InnoDB Cluster and MySQL Group Replication </br>
+Schema name is 'mysql_gr_replication_metadata', and it is used to maintain the integration between the two.
 ### E.7. Handling Mismatch between 'replication_group_members' and 'group_replication_group_seeds'
 Since this plugin does not use metadata to maintain Group Replication as in MySQL InnoDB Cluster, </br>
 it relies on 2 MySQL components to maintain the group membership:
