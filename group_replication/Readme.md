@@ -182,4 +182,11 @@ Login to Group Replication's PRIMARY node, and clone database from InnoDB Cluste
 mysqlsh > group_replication.autoCloneICtoGR()
 ```
 Data from InnoDB Cluster will be copied into Group Replication, and this process is COMPLETELY ONLINE.
-
+#### F.1.3. Setup Asynchronous Replication from MySQL InnoDB Cluster to MySQL Group Replication
+Follow section E.6.
+![Image of Yaktocat](https://github.com/tripplea-sg/mysqlsh/blob/main/group_replication/picture/Operation.png)
+- If PRIMARY node of MySQL InnoDB Cluster as replication source is changed, replication will be automatically diverted from new PRIMARY
+- If PRIMARY node of MySQL Group Replication as replica is changed, the replication has to be manually started on the new PRIMARY node of MySQL Group Replication with the following command:
+```
+mysqlsh > group_replication.startMultiClusterChannel('mychannel')
+```
