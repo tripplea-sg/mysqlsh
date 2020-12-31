@@ -1,2 +1,2 @@
-# mysqlsh
-This is my work on mysqlshell. </br>
+# MySQL Shell Custom Plugin
+This repository keeps my work on MySQL Shell custom plugin </br>
