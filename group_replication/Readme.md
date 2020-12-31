@@ -10,7 +10,7 @@ This method is distributed as Open Source in the hope that it will be useful, bu
 
 ## A. List of Functions
 
-| Purpose | InnoDB Cluster Command | Group Replication Command |
+| Purpose | InnoDB Cluster (Standard AdminAPI) | Group Replication (Add-on) |
 | ------|-------------|---------------- |
 | Configure Instance | mysqlsh > dba.configureInstance() | mysqlsh > dba.configureInstance() |
 | Create / Deploy | mysqlsh > dba.createCluster('cluster_name') | mysqlsh > group_replication.create() |
