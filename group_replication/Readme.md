@@ -229,11 +229,13 @@ mysqlsh > group_replication.setMultiClusterChannel('channel1','gr-1',3306)
 mysqlsh > group_replication.setFailoverOnChannel('channel1')
 ```
 #### F.3.3. Switch Back Operation to use Production Site
-Plan a time to switch back, and perform the following:
+Plan a time to perform site switch back:
 - convert MySQL InnoDB Cluster on DR site into MySQL Group Replication
 - convert MySQL Group Replication on Production site into MySQL InnoDB Cluster
 - Setup replication from MySQL InnoDB Cluster on Production site to MySQL Group Replication on DR site
-Use the follong 1 command:
+```
+```
+Simply use one command to execute:
 ```
 mysqlsh > group_replication.flipClusterRoles('mycluster')
 ```
