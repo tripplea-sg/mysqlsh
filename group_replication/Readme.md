@@ -171,7 +171,7 @@ If group_replication_group_seeds is out of sync with group_replication_group_mem
 mysqlsh > group_replication.syncLocalMembers()
 ```
 ## F. Functions for DR Used Case
-### F.1. Group Replication as DR Environment
+### F.1. Setup Group Replication as DR Environment
 This section offers solution for DR environment using Group Replication while Production uses MySQL InnoDB Cluster
 #### F.1.1. Install a New Group Replication
 Follow section D2 and D3. 
@@ -190,3 +190,7 @@ Follow section E.6.
 ```
 mysqlsh > group_replication.startMultiClusterChannel('mychannel')
 ```
+### F.2. Site Switch Over
+This section explains how to perform site switchover, whereby Production site becomes DR and DR site becomes Production:
+- MySQL InnoDB Cluster on Production site is to be converted into MySQL Group Replication
+- MySQL Group Replication on DR site is to be converted into MySQL InnoDB Cluster
