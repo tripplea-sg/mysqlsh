@@ -12,6 +12,11 @@ Automatically USING SINGLE API COMMAND
 
 ## Plugin Installation
 
+CREATE new FOLDER $HOME/.mysqlsh/plugins/validate_password/
+</br></br>
+DOWNLOAD init.py and password_validation.py from https://github.com/tripplea-sg/mysqlsh/edit/main/validate_password  </br>
+COPY both files into $HOME/.mysqlsh/plugins/validate_password/
+
 ## Tutorial
 
 To install the PASSWORD VALIDATION plugin on single database and MySQL InnoDB Cluster / Group Replication
