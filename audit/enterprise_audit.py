@@ -171,7 +171,7 @@ def initPluginOnReplica():
 
                 mysqlsh > audit.initPluginOnReplica()
 
-            3. On PRIMARY node of InnoDB Cluster as a Cluster SOURCE
+            2. On PRIMARY node of InnoDB Cluster as a Cluster SOURCE
 
                 mysqlsh > audit.installPlugin()
     """
