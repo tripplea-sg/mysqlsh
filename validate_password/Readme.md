@@ -13,7 +13,15 @@ Automatically USING SINGLE API COMMAND
 ## Plugin Installation
 
 ## Tutorial
-        
+
+To install the PASSWORD VALIDATION plugin on single database and MySQL InnoDB Cluster / Group Replication
+
+                mysqlsh > validate_password.installPlugin()
+          
+To set PASSWORD VALIDATION policies on single database and MySQL InnoDB Cluster / Group Replication
+
+                mysqlsh > validate_password.setPolicy()
+
 On a multi-cluster environment (InnoDB Cluster replication to Group Replication), the PASSWORD VALIDATION plugin has to be installed on both, separately.
 
             1. On PRIMARY node of InnoDB Cluster as Cluster SOURCE
