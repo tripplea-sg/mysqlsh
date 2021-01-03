@@ -149,17 +149,27 @@ def installPlugin():
         _install_audit_plugin(shell.parse_uri(shell.get_session().get_uri())['user'])
 
 @plugin_function("audit.initPluginOnClusterReplica")
-def initPluginOnClusterReplica():
+def initPluginOnReplica():
     """
     Audit Plugin FILE Installation on A Multi-Cluster Environment
 
     A function to:
 
+        Install Audit plugin FILE on the REPLICA of a SOURCE-REPLICA Environment
+        
+            1. On REPLICA
+            
+                mysqlsh > audit.initPluginOnReplica()
+            
+            2. On SOURCE
+            
+                mysqlsh > audit.installPlugin()
+        
         Install Audit plugin FILE on a Multi-Cluster Environment. When MySQL Group Replication is running as a Cluster REPLICA, before running audit.installPlugin() on InnoDB Cluster as Cluster SOURCE to install MySQL Enterprise Audit, please run first this function on the Group Replication. This function will install Audit plugin FILE automatically on ALL Group Replication's Nodes
 
             1. On PRIMARY node of Group Replication as a Cluster REPLICA
 
-                mysqlsh > audit.initPluginOnClusterReplica()
+                mysqlsh > audit.initPluginOnReplica()
 
             3. On PRIMARY node of InnoDB Cluster as a Cluster SOURCE
 
