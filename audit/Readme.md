@@ -6,6 +6,11 @@ Install MySQL Enterprise Audit plugin on single database, AND All MySQL InnoDB C
 
 ## Plugin Installation
 
+CREATE new FOLDER $HOME/.mysqlsh/plugins/audit/
+
+DOWNLOAD init.py and enterprise_audit.py from https://github.com/tripplea-sg/mysqlsh/edit/main/audit
+COPY both files into $HOME/.mysqlsh/plugins/audit/
+
 ## Tutorial
 
 To install MySQL Enterprise Audit on Single database, simply run
