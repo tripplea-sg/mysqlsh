@@ -23,11 +23,21 @@ To install MySQL Enterprise Audit on MySQL InnoDB Cluster / Group Replication, s
 
             mysqlsh > audit.installPlugin()
         
+To install MySQL Enterprise Audit on a SOURCE-REPLICA environment, some steps are required to be executed in sequence
+
+            1. On REPLICA
+
+                mysqlsh > audit.initPluginOnReplica()
+
+            2. On SOURCE
+
+                mysqlsh > audit.installPlugin()
+
 To install MySQL Enterprise Audit on a multi-cluster environment (MySQL InnoDB Cluster replication to MySQL Group Replication), some steps are required to be executed in sequence
 
             1. On PRIMARY Node of MySQL Group Replication as Cluster REPLICA
                 
-                mysqlsh > audit.initPluginOnClusterReplica()
+                mysqlsh > audit.initPluginOnReplica()
 
             2. On PRIMARY Node of MySQL InnoDB Cluster as Cluster SOURCE
                 
