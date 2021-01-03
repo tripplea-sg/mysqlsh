@@ -2,7 +2,9 @@
     
 ## A collection of functions to:
 
-Install MySQL Enterprise Audit plugin on single database, AND All MySQL InnoDB Cluster / Group Replication databases Automatically USING SINGLE API COMMAND
+Install MySQL Enterprise Audit plugin on single database, AND All MySQL InnoDB Cluster / Group Replication databases Automatically USING SINGLE API COMMAND </br>
+
+This method is distributed as Open Source in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 ## Plugin Installation
 
