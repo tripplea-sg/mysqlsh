@@ -9,6 +9,9 @@ Automatically USING SINGLE API COMMAND
 Set PASSWORD VALIDATION  Policy on single database,
 AND All MySQL InnoDB Cluster / Group Replication databases 
 Automatically USING SINGLE API COMMAND
+</br>
+
+This method is distributed as Open Source in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 ## Plugin Installation
 
