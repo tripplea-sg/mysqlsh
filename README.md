@@ -8,6 +8,6 @@ This repository stores my work on MySQL Shell custom plugin </br>
 The Plugins are developed to work on:
 1. MySQL Enterprise Edition 8.0 
 2. MySQL Shell 8.0.22
-3. MySQL Standalone database
+3. MySQL SOURCE-REPLICA
 4. MySQL InnoDB Cluster
 5. MySQL Group Replication
