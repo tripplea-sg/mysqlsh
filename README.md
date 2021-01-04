@@ -11,3 +11,4 @@ The Plugins are developed to work on:
 3. MySQL SOURCE-REPLICA
 4. MySQL InnoDB Cluster
 5. MySQL Group Replication
+6. MySQL Multi-Cluster (InnoDB Cluster replication to Group Replication)
