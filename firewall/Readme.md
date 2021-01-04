@@ -88,6 +88,12 @@ To INJECT a FIREWALL_RULE, run the following (if target databases are InnoDB Clu
 To BUILK LOAD and IMPORT FIREWALL Rules, run the following (if target databases are InnoDB Cluster or Group Replication, then Connect only to the PRIMARY node, and the CHANGE will be propagated AUTOMATICALLY to ALL NODES) 
 
             1. LOAD your FIREWALL RULES and USERS into the Firewall Interface Table
+            
+                Example: 
+                
+                insert into MYSQL_SECURITY_METADATA.firewall_whitelist (userhost, rule) values ('fwuser@%', "select * from sakila.customer")
+                insert into MYSQL_SECURITY_METADATA.firewall_whitelist (userhost, rule) values ('fwuser@%', "select * from sakila.ciry")
+                insert into MYSQL_SECURITY_METADATA.firewall_whitelist (userhost, rule) values ('fwuser@%', "show databases")
 
             2. IMPORT FIREWALL RULES from Firewall Interface Table
 
