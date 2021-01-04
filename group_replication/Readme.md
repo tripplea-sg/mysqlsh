@@ -1,9 +1,10 @@
 # MySQL Group Replication management and utilities
 
 A collection of functions to: </br>
-- Deploy and manage MySQL Group Replication without using MySQL InnoDB Cluster (no metadata) 
-- Deploy and manage Asynchronous Replication between MySQL InnoDB Cluster and MySQL Group Replication
-- Orchestrate the switch over process to flip MySQL InnoDB Cluster into MySQL Group Replication and vice versa 
+- Deploy and manage MySQL Group Replication without using MySQL InnoDB Cluster (no metadata) as if deploying InnoDB Cluster
+- Deploy and manage Asynchronous Replication between MySQL InnoDB Cluster and MySQL Group Replication using Plugin API Command
+- Clone MySQL InnoDB Cluster to MySQL Group Replication using single PLUGIN API COMMAND
+- Orchestrate the switch over process to flip MySQL InnoDB Cluster into MySQL Group Replication and vice versa using single PLUGIN API COMMAND 
 
 This method is distributed as Open Source in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
