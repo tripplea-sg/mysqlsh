@@ -25,8 +25,34 @@ COPY both files into $HOME/.mysqlsh/plugins/validate_password/
 To install the PASSWORD VALIDATION plugin on single database and MySQL InnoDB Cluster / Group Replication
 
                 mysqlsh > validate_password.installPlugin()
+                
+                If InnoDB Cluster / Group Replication, VALIDATE_PASSWORD plugin
+                will be INSTALLED AUTOMATICALLY on ALL NODES
           
 To set PASSWORD VALIDATION policies on single database and MySQL InnoDB Cluster / Group Replication
+
+                mysqlsh > validate_password.setPolicy()
+                
+                If InnoDB Cluster / Group Replication, VALIDATE_PASSWORD_* SYSTEM VARIABLES
+                will be SET AUTOMATICALLY on ALL NODES
+
+On a SOURCE-REPLICA environment, the PASSWORD VALIDATION plugin has to be installed on both, separately
+
+            1, On SOURCE
+
+                mysqlsh > validate_password.installPlugin()
+
+            2. On REPLICA
+
+                mysqlsh > validate_password.installPlugin()
+
+On a SOURCE-REPLICA environment, set PASSWORD VALIDATION policy has to be executed on both, separately
+
+            1. On SOURCE
+
+                mysqlsh > validate_password.setPolicy()
+
+            2. On REPLICA
 
                 mysqlsh > validate_password.setPolicy()
 
@@ -45,7 +71,7 @@ On a multi-cluster environment (InnoDB Cluster replication to Group Replication,
             1. On PRIMARY node of InnoDB Cluster as Cluster SOURCE
 
                 mysqlsh > validate_password.setPolicy()
-
+            
             2. On PRIMARY node of Group Replication as Cluster REPLICA
 
                 mysqlsh > validate_password.setPolicy()
