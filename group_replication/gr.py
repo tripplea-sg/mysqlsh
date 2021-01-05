@@ -302,7 +302,9 @@ def i_clone(source, cloneAdmin, cloneAdminPassword):
     result = i_run_sql("set global clone_valid_donor_list='" + source + "';","", False)
     print("Clone database is started ...")
     result = i_run_sql("set global super_read_only=off;","", False)
-    result = i_run_sql("clone instance from " + cloneAdmin + "@" + source + " identified by '" + cloneAdminPassword + "'", "", False)
+    _host = shell.parse_uri(cloneAdmin + '@' + source)['host']
+    _port = shell.parse_uri(cloneAdmin + '@' + source)['port']
+    result = i_run_sql("clone instance from " + cloneAdmin + "@'" + _host + "':" + str(_port) + " identified by '" + cloneAdminPassword + "'", "", False)
     time.sleep(10)
 
 def i_checkIfAsyncFailoverImplemented(channel_name):
