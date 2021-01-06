@@ -111,6 +111,9 @@ def i_sess_identity(conn):
     if conn == "current":
         result = i_run_sql("show variables like 'report_host'","[']",False)
         hostname = result[0].strip("report_host'").strip(", '")
+        if len(hostname.strip()) == 0:
+           result = i_run_sql("select @@hostname", "[']", False)
+           hostname = result[0]
         x = shell.parse_uri(shell.get_session().get_uri())
     else:
         z = shell.get_session()
@@ -118,6 +121,9 @@ def i_sess_identity(conn):
         shell.set_session(y)
         result = i_run_sql("show variables like 'report_host'","[']",False)
         hostname = result[0].strip("report_host'").strip(", '")
+        if len(hostname.strip()) == 0:
+           result = i_run_sql("select @@hostname", "[']", False)
+           hostname = result[0]
         shell.set_session(z)
         x = shell.parse_uri(conn)
         clusterAdminPassword = x['password']
