@@ -206,6 +206,8 @@ mysqlsh > group_replication.flipClusterRoles('mycluster')
 During production site downtime, DR site has to be activated:
 - convert MySQL Group Replication on DR site into MySQL InnoDB Cluster
 ```
+mysqlsh > group_replication.stopMultiClusterChannel('channel1')
+mysqlsh > group_replication.removeFailoverChannel('channel1')
 mysqlsh > group_replication.convertToIC('mycluster')
 ```
 - Setup Router to connect to this InnoDB Cluster for application to connect and use
