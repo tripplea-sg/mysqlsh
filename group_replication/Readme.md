@@ -6,6 +6,7 @@ A collection of functions to: </br>
 - Clone MySQL InnoDB Cluster to MySQL Group Replication using single PLUGIN API COMMAND
 - Orchestrate the switch over process to flip MySQL InnoDB Cluster into MySQL Group Replication and vice versa using single PLUGIN API COMMAND 
 
+## Disclaimer:
 This method is distributed as Open Source in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
 
 ## A. List of Functions
