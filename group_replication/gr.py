@@ -90,6 +90,7 @@ def _get_gtid():
     return result[0][1]
 
 def _drop_ic_metadata():
+    result = _run_sql("set global super_read_only=off", False)
     result = _run_sql("drop database if exists mysql_innodb_cluster_metadata;",False)
 
 def _list_all_channel():
