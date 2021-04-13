@@ -1061,8 +1061,8 @@ def claimPrimaryCluster():
         print('\n\033[1mERROR:\033[0m DB Cloning has to be executed from PRIMARY node \n')
         return
 
-    autoFlipProcess = True
-    autoCloneProcess = True
+ #   autoFlipProcess = True
+ #   autoCloneProcess = True
 
     clusterAdmin, foo, hostname, port = _session_identity("current")
     clusterAdminPassword = shell.prompt("Please provide the password for '" + clusterAdmin + "' : ", {'type':'password'})
@@ -1092,7 +1092,7 @@ def claimPrimaryCluster():
     adoptFromIC()
 
     shell.set_session(x)
-    stopPrimaryCluster()
+ #   stopPrimaryCluster()
 
     result = _run_sql("set global super_read_only=off", False)
     convertToIC(cluster_name[0][0])
@@ -1102,6 +1102,6 @@ def claimPrimaryCluster():
 
     shell.set_session(x)
 
-    autoFlipProcess = False
+   # autoFlipProcess = False
 
 
