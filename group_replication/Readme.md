@@ -23,7 +23,7 @@ This method is distributed as Open Source in the hope that it will be useful, bu
 | Set Instance Option | mysqlsh > cluster.setInstanceOptions(<option>) | |
 | Remove Instance | mysqlsh > cluster.removeInstance('instance') | mysqlsh > group_replication.removeInstance('instance') |
 | Dissolve cluster | mysqlsh > cluster.dissolve() | mysqlsh > group_replication.dissolve() |
-| Convert to InnoDB Cluster | mysqlsh > dba.create_cluster('clusterName', {"adoptFromGR":True})  | mysqlsh > group_replication.convertToIC('cluster_name') |
+| Convert to InnoDB Cluster | mysqlsh > dba.create_cluster('clusterName', {"adoptFromGR":True})  | mysqlsh > group_replication.convertToIC() |
 | Convert from InnoDB Cluster to Group Replication |  | mysqlsh > group_replication.adoptFromIC() |
 | Set replication from InnoDB Cluster | | mysqlsh > group_replication.setPrimaryCluster(connectionStr) |
 | Start replication channel | | mysqlsh > group_replication.setPrimaryCluster(connectionStr) |
@@ -93,7 +93,7 @@ mysqlsh > group_replication.rebootGRFromCompleteOutage()
 To convert a Group Replication into MySQL InnoDB Cluster, login to PRIMARY node and run below function. </br>
 Assume cluster_name is 'mycluster'
 ```
-mysqlsh > group_replication.convertToIC('mycluster')
+mysqlsh > group_replication.convertToIC()
 ```
 ### D.4. Convert MySQL InnoDB Cluster to MySQL Group Replication
 To convert an InnoDB Cluster into MySQL Group Replication and remove mysql_innodb_cluster_metadata, login to PRIMARY node and run below function:
@@ -119,7 +119,7 @@ During production site downtime, DR site has to be activated:
 - convert MySQL Group Replication on DR site into MySQL InnoDB Cluster
 ```
 mysqlsh > group_replication.stopPrimaryCluster()
-mysqlsh > group_replication.convertToIC('mycluster')
+mysqlsh > group_replication.convertToIC()
 ```
 When production available:
 ```
