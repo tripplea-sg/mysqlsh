@@ -1,4 +1,4 @@
-# MySQL Group Replication management and utilities (MySQL 8.0.23)
+# MySQL Group Replication management and utilities (MySQL 8.0.25)
 
 A collection of functions to: </br>
 - Deploy and manage MySQL Group Replication without using MySQL InnoDB Cluster (no metadata) as if deploying InnoDB Cluster
