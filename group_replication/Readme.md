@@ -123,7 +123,7 @@ mysqlsh > group_replication.convertToIC()
 ```
 When production available:
 ```
-mysqlsh > dba.rebootGRFromCompleteOutage()
+mysqlsh > group_replication.rebootGRFromCompleteOutage()
 mysqlsh > group_replication.setPrimaryCluster("gr-1:3306")
 ```
 Switch Back Operation to use Production Site from Group Replication:
